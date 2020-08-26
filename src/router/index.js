@@ -1,29 +1,34 @@
 import Vue from "vue";
-import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
+import Router from "vue-router";
 
-Vue.use(VueRouter);
+Vue.use(Router);
+const originalPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err);
+};
 
 const routes = [
   {
-    path: "/",
-    name: "Home",
-    component: Home
+    path: "/login",
+    component: () => import("@/views/login/index")
   },
   {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
+    path: "/401",
+    component: () => import("@/views/errorPage/401")
+  },
+  {
+    path: "/",
+    component: () => import("@/views/home/index")
+  },
+  {
+    path: "*",
+    component: () => import("@/views/errorPage/404")
   }
 ];
 
-const router = new VueRouter({
+const router = new Router({
   mode: "history",
-  base: process.env.BASE_URL,
+  scrollBehavior: () => ({ y: 0 }),
   routes
 });
 
