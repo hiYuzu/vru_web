@@ -13,6 +13,14 @@ const routes = [
     component: () => import("@/views/login/index")
   },
   {
+    path: "/table",
+    component: () => import("@/views/history/table")
+  },
+  {
+    path: "/line",
+    component: () => import("@/views/history/line")
+  },
+  {
     path: "/401",
     component: () => import("@/views/errorPage/401")
   },
