@@ -10,11 +10,14 @@
         class="cloud"
       ></div>
     </div>
-    <div class="logintop">
+    <!--   <div class="logintop">
       <span>欢迎登录油气回收在线监测系统</span>
-    </div>
+    </div> -->
     <div class="loginbody">
       <span style="height: 100px"></span>
+      <div class="logintop">
+        <span>欢迎登录油气回收在线监测系统</span>
+      </div>
       <div class="loginbox">
         <div class="twobar">
           <a href="javascript:;" class="twobar-item twobar-item-android"
@@ -25,6 +28,9 @@
           </a>
         </div>
         <ul>
+          <li data-v-37dfd6fc="" style="color:#426666;;font-weight:bold;">
+            <label>用户登录</label>
+          </li>
           <li>
             <div class="form-message"></div>
           </li>
@@ -38,6 +44,27 @@
               class="loginpwd"
               @keyup.enter="logins"
             />
+          </li>
+          <li id="drag_wrap" class="fm-item">
+            <valid-code
+              status="status"
+              :successFun="onMpanelSuccess"
+              :errorFun="onMpanelError"
+            ></valid-code>
+            <!--  <div id="drag_bg"></div>
+            <div id="drag_box"></div>
+            <div id="drag_txt">
+              <span class="startTxt" id="startTxt"
+                >请按住滑块，拖动到最右边</span
+              >
+              <input
+                type="text"
+                value=""
+                name="code"
+                id="code"
+                hidden="hidden"
+              />
+            </div> -->
           </li>
           <li>
             <button type="submit" class="loginbtn" @click="logins">
@@ -55,7 +82,15 @@
 
 <script>
 import { getToken } from "@/utils/auth";
-
+import ValidCode from "./../../components/ValidCode.vue";
+var checkStatus = (rule, value, callback) => {
+  console.log(value);
+  if (!value) {
+    return callback(new Error("请拖动滑块完成验证"));
+  } else {
+    callback();
+  }
+};
 export default {
   name: "Login",
   data() {
@@ -69,9 +104,11 @@ export default {
       offset1: 450,
       offset2: 0,
       offsetbg: 0,
-      mainwidth: 1600
+      mainwidth: 1600,
+      status: [{ validator: checkStatus, trigger: "change" }]
     };
   },
+  components: { ValidCode },
   watch: {
     $route: {
       handler: function(route) {
@@ -89,8 +126,8 @@ export default {
     if (token) {
       this.$router.push("/");
     }
-    setInterval(this.cloud1, 70);
-    setInterval(this.cloud2, 90);
+    /*  setInterval(this.cloud1, 70);
+    setInterval(this.cloud2, 90); */
   },
   methods: {
     logins: function() {
@@ -133,7 +170,9 @@ export default {
         this.offsetbg = -580;
       }
       this.offsetbg += 0.9;
-    }
+    },
+    onMpanelError() {},
+    onMpanelSuccess() {}
   }
 };
 </script>
@@ -157,11 +196,11 @@ img {
 }
 
 #login {
-  background: {
+  /* background: {
     color: #5f89f7;
     image: url(~@/assets/images/login/light.png);
     repeat: no-repeat;
-  }
+  } */
   height: 100%;
   display: flex;
   overflow: hidden;
@@ -186,8 +225,9 @@ img {
   .logintop {
     height: 47px;
     position: absolute;
-    top: 0px;
-    background: url(~@/assets/images/login/loginbg1.png) repeat-x;
+    top: 12.7%;
+    /*  background: url(~@/assets/images/login/loginbg1.png) repeat-x; */
+    background: #426666;
     z-index: 100;
     width: 100%;
     span {
@@ -200,7 +240,8 @@ img {
     }
   }
   .loginbody {
-    background: url(~@/assets/images/login/loginbg3.png) no-repeat center center;
+    background: url(~@/assets/images/login/bg-login-1.jpg) no-repeat center
+      center;
     width: 100%;
     height: 685px;
     overflow: hidden;
@@ -218,10 +259,14 @@ img {
     .loginbox {
       width: 850px;
       height: 500px;
-      background: url(~@/assets/images/login/logininfo2.png) no-repeat;
+      /*   background: url(~@/assets/images/login/logininfo2.png) no-repeat; */
       ul {
-        margin-top: 200px;
-        margin-left: 435px;
+        margin-top: 50px;
+        margin-left: 475px;
+        padding: 30px;
+        border-radius: 10px;
+        background: rgba(221, 235, 199, 0.4);
+        box-shadow: 0px 0px 20px 8px #b5b5b5;
         li {
           margin-bottom: 25px;
           .form-message {
@@ -253,9 +298,11 @@ img {
             color: #90a2bc;
           }
           .loginbtn {
-            width: 111px;
+            width: 299px;
             height: 35px;
-            background: url(~@/assets/images/login/buttonbg.png) repeat-x;
+            /*       background: url(~@/assets/images/login/buttonbg.png) repeat-x; */
+            /*  background: #6e9ef8; */
+            background: #426666;
             font-size: 14px;
             font-weight: bold;
             color: #fff;
@@ -298,10 +345,11 @@ img {
 }
 .twobar {
   display: block;
-  position: fixed;
+  position: absolute;
   z-index: 999999999;
   right: 1px;
-  top: 0;
+  top: 12.5%;
+  margin-right: -6px;
   cursor: pointer;
   transition: all 0.3s ease;
 } /*假设网页宽度为1200px，导航条在右侧悬浮*/
@@ -337,7 +385,7 @@ img {
 .twobar-layer {
   position: absolute;
   right: -10px;
-  bottom: -243px;
+  bottom: -300px; /* -243px; */
   width: 172px;
   opacity: 0;
   filter: alpha(opacity=0);
@@ -356,5 +404,83 @@ img {
   -ms-transition: all 1s;
   -o-transition: all 1s;
   -webkit-transition: all 1s;
+}
+
+#drag_wrap {
+  width: 300px; /*300px*/
+  height: 35px;
+  position: relative;
+  background: #e8e8e8;
+  margin: 20px 0px; /*300px auto*/
+}
+
+#drag_bg {
+  width: 0;
+  height: 35px;
+  background: #7ac23c;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#drag_box {
+  width: 40px;
+  height: 33px;
+  border: 1px solid #ccc;
+  background: #fff url(/view/plugins/drag/rt.png) no-repeat center center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: move;
+  z-index: 2;
+}
+
+#drag_txt {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  position: absolute;
+  z-index: 1;
+  background: transparent;
+  color: #9c9c9c;
+  line-height: 35px;
+  font-size: 12px;
+}
+
+#drag_txt span {
+  cursor: default;
+  z-index: 0;
+}
+
+#drag_txt .startTxt {
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right top,
+    color-stop(0, #4d4d4d),
+    color-stop(0.4, #4d4d4d),
+    color-stop(0.5, #fff),
+    color-stop(0.6, #4d4d4d),
+    color-stop(1, #4d4d4d)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-animation: slidetounlock 3s infinite;
+  -webkit-text-size-adjust: none;
+}
+
+@-webkit-keyframes slidetounlock {
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: 200px 0;
+  }
+}
+
+.yseTxt {
+  background: none;
+  color: #fff;
 }
 </style>
