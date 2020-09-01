@@ -6,7 +6,7 @@
         v-model="head.institutionId"
         placeholder="请选择发油库"
         size="mini"
-        @change="queryByHeadByDeviceCode"
+        @change="fileterDevice"
       >
         <el-option
           v-for="item in head.institutionData"
@@ -20,7 +20,7 @@
         v-model="head.deviceId"
         placeholder="请选择发油设备"
         size="mini"
-        @change="queryByHeadByDeviceCode"
+        @change="filterThing"
       >
         <el-option
           v-for="item in head.deviceData"
@@ -45,6 +45,16 @@
         >
         </el-option>
       </el-select>
+      <span class="">数据类型 : </span>
+      <el-select v-model="head.dataType" size="mini">
+        <el-option
+          v-for="item in dataTypeData"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        >
+        </el-option>
+      </el-select>
       <span class="">时间段 : </span>
       <el-date-picker
         size="mini"
@@ -63,14 +73,14 @@
         type="primary"
         icon="el-icon-receiving"
         size="mini"
-        @click="exportExcel"
+        @click="fileterDevice"
         >导出到Excel
       </el-button>
     </div>
     <div class="pmClass">
       <div class="tableDiv">
         <div class="box-header">
-          <h3 class="box-title">PM统计数据</h3>
+          <h3 class="box-title">历史数据统计</h3>
         </div>
         <tl-table
           :tableData="tableData"
@@ -97,7 +107,7 @@
 
 <script>
 import tlTable from "@/components/TableNoPage.vue";
-import { queryHead } from "@/api/user";
+import { historyHeadInit } from "@/api/user";
 
 export default {
   name: "PmStatistic",
@@ -108,78 +118,45 @@ export default {
         institutionId: null,
         deviceId: null,
         thingCode: [],
-        time: null,
+        time: "",
+        dataType: 2011,
         institutionData: [],
         deviceData: [],
         thingData: []
       },
+      deviceData: [],
+      thingData: [],
+      deviceThingData: [],
+      dataTypeData: [
+        { label: "实时数据", value: 2011 },
+        { label: "分钟数据", value: 2051 },
+        { label: "小时数据", value: 2061 },
+        { label: "每日数据", value: 2031 }
+      ],
       total: 5,
       currentPage: 1,
       pageSize: 10,
       pageSizes: [10, 20, 30, 40, 50],
-      xAxisData: [],
-      seriesData: [],
       tableData: [],
       allTableData: [],
       height: 620,
       theadBody: [
         {
           prop: "deviceName",
-          text: "车辆名称"
+          text: "设备名称"
         },
         {
-          prop: "deviceCode",
+          prop: "thingCode",
           text: "设备编号"
         },
         {
-          prop: "batchNo",
-          text: "批次号"
-        },
-        {
-          prop: "streetName",
-          text: "道路名称"
+          prop: "thingAvg",
+          text: "平均值"
         },
         {
           prop: "beginTime",
           text: "开始时间",
           width: 150
-        },
-        {
-          prop: "endTime",
-          text: "结束时间",
-          width: 150
-        },
-        {
-          prop: "speed",
-          text: "车速(km/h)"
-        },
-        {
-          prop: "humidity",
-          text: "湿度(%)"
-        },
-        {
-          prop: "temperature",
-          text: "温度(℃)"
-        },
-        {
-          prop: "windSpeed",
-          text: "风速(m/s)"
-        },
-        {
-          prop: "pm1Road",
-          text: "PM1道路(mg/m23)"
-        },
-        {
-          prop: "pm25Road",
-          text: "PM2.5道路(mg/m23)"
-        },
-        {
-          prop: "pm10Road",
-          text: "PM10道路(mg/m23)"
-        },
-        {
-          prop: "nox",
-          text: "NOx(ppm)"
         }
       ]
     };
@@ -189,29 +166,22 @@ export default {
   },
   methods: {
     init() {
-      queryHead(null)
+      historyHeadInit()
         .then(res => {
           const { data } = res.data;
-          if (data) {
-            this.head.institutionData = data.institutionData;
-            this.head.deviceData = data.deviceData;
-            this.head.thingData = data.thingData;
-            this.head.institutionId = this.head.institutionData[0].value;
-            this.head.deviceId = this.head.deviceData[0].value;
-          } else {
-            this.head = {
-              institutionId: null,
-              deviceId: null,
-              thingCode: [],
-              institutionData: [],
-              deviceData: [],
-              thingData: []
-            };
-          }
+          this.head.institutionData = data.institutionData;
+          this.deviceData = data.deviceData;
+          this.thingData = data.thingData;
+          this.deviceThingData = data.deviceThingData;
+          this.head.institutionId = this.head.institutionData[0].value;
+          this.fileterDevice();
         })
         .catch(() => {
           this.$message.error("查询数据异常！");
         });
+    },
+    query() {
+      console.info("query");
     },
     handleSizeChange(size) {
       this.pageSize = size;
@@ -225,8 +195,42 @@ export default {
       let index = (currentPage - 1) * pageSize;
       this.tableData = this.allTableData.slice(index, index + pageSize);
     },
-    queryByHeadByDeviceCode() {},
-    queryByDeviceCodeAndTime() {}
+    fileterDevice() {
+      this.head.deviceData = [];
+      this.head.deviceId = null;
+      for (let device of this.deviceData) {
+        if (this.head.institutionId == device.id) {
+          this.head.deviceData.push(device);
+        }
+      }
+      if (this.head.deviceData.length > 0) {
+        this.head.deviceId = this.head.deviceData[0].value;
+      }
+      this.filterThing();
+    },
+    filterThing() {
+      this.head.thingData = [];
+      this.head.thingCode = [];
+
+      for (let thing of this.thingData) {
+        let status = false;
+        for (let deviceThing of this.deviceThingData) {
+          if (
+            this.head.deviceId == deviceThing.deviceId &&
+            deviceThing.thingId == thing.id
+          ) {
+            status = true;
+            break;
+          }
+        }
+        if (status) {
+          this.head.thingData.push(thing);
+        }
+      }
+      if (this.head.thingData.length > 0) {
+        this.head.thingCode[0] = this.head.thingData[0].value;
+      }
+    }
   }
 };
 </script>

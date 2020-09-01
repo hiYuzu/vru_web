@@ -3,13 +3,13 @@
     <div class="head">
       <span class="">发油库 : </span>
       <el-select
-        v-model="head.institutionName"
+        v-model="head.institutionId"
         placeholder="请选择发油库"
         size="mini"
-        @change="queryByHeadByDeviceCode"
+        @change="fileterDevice"
       >
         <el-option
-          v-for="item in institutionData"
+          v-for="item in head.institutionData"
           :key="item.label"
           :label="item.label"
           :value="item.value"
@@ -17,28 +17,32 @@
       </el-select>
       <span class="">发油设备 : </span>
       <el-select
-        v-model="head.deviceCode"
+        v-model="head.deviceId"
         placeholder="请选择发油设备"
         size="mini"
-        @change="queryByHeadByDeviceCode"
+        @change="filterThing"
       >
         <el-option
-          v-for="item in deviceData"
+          v-for="item in head.deviceData"
           :key="item.label"
           :label="item.label"
           :value="item.value"
         ></el-option>
       </el-select>
       <span class="">监测物质 : </span>
-      <el-select
-        v-model="head.thingName"
-        placeholder="请选择"
-        size="mini"
-        multiple
-        collapse-tags
-      >
+      <el-select v-model="head.thingCode" placeholder="请选择" size="mini">
         <el-option
-          v-for="item in thingData"
+          v-for="item in head.thingData"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        >
+        </el-option>
+      </el-select>
+      <span class="">数据类型 : </span>
+      <el-select v-model="head.dataType" size="mini">
+        <el-option
+          v-for="item in dataTypeData"
           :key="item.value"
           :label="item.label"
           :value="item.value"
@@ -60,21 +64,21 @@
         type="primary"
         icon="el-icon-search"
         size="mini"
-        @click="queryByHeadByDeviceCode"
+        @click="fileterDevice"
         >搜索
       </el-button>
       <el-button
         type="primary"
         icon="el-icon-receiving"
         size="mini"
-        @click="queryByHeadByDeviceCode"
+        @click="fileterDevice"
         >导出到Excel
       </el-button>
     </div>
     <div class="pmClass">
       <div class="tableDiv">
         <div class="box-header">
-          <h3 class="box-title">PM统计数据</h3>
+          <h3 class="box-title">历史统计数据</h3>
         </div>
         <div id="main" style="width:100%;height:400px;"></div>
       </div>
@@ -83,76 +87,87 @@
 </template>
 
 <script>
-import { getStatisticData } from "@/api/user";
+import { historyHeadInit } from "@/api/user";
 
 export default {
   name: "historyLine",
   data() {
     return {
       head: {
-        institutionName: null,
-        deviceCode: null,
-        thingName: null,
-        time: null
+        institutionId: null,
+        deviceId: null,
+        thingCode: null,
+        dataType: 2011,
+        time: "",
+        institutionData: [],
+        deviceData: [],
+        thingData: []
       },
-
-      institutionData: [],
       deviceData: [],
       thingData: [],
-
+      deviceThingData: [],
+      dataTypeData: [
+        { label: "实时数据", value: 2011 },
+        { label: "分钟数据", value: 2051 },
+        { label: "小时数据", value: 2061 },
+        { label: "每日数据", value: 2031 }
+      ],
       xAxisData: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       seriesData: [820, 932, 901, 934, 1290, 1330, 1320]
     };
   },
   methods: {
-    initPmSta() {
-      let queryParams = this.$store.state.statistic.queryParam;
-      let param = {};
-      param.deviceCode = queryParams.deviceCode;
-      param.batchNo = queryParams.batchNo;
-      param.streetId = [];
-      for (let i = 0; i < queryParams.streetId.length; i++) {
-        param.streetId.push(queryParams.streetId[i]);
-      }
-      //发送请求
-      getStatisticData(param)
+    init() {
+      historyHeadInit()
         .then(res => {
-          if (res.success) {
-            //表格，分页
-            this.total = parseFloat(res.total);
-            this.allTableData = res.data.tableData;
-            this.getData(this.currentPage, this.pageSize);
-            //lineChart
-            if (res.data.lineData == null) {
-              this.xAxisData = [];
-            } else {
-              this.xAxisData = res.data.lineData.xAxisData;
-            }
-            if (res.data.lineData == null) {
-              this.seriesData = [];
-            } else {
-              this.seriesData = res.data.lineData.seriesData;
-            }
-          }
+          const { data } = res.data;
+          this.head.institutionData = data.institutionData;
+          this.deviceData = data.deviceData;
+          this.thingData = data.thingData;
+          this.deviceThingData = data.deviceThingData;
+          this.head.institutionId = this.head.institutionData[0].value;
+          this.fileterDevice();
         })
         .catch(() => {
-          this.$message.error("查询PM数据异常！");
+          this.$message.error("查询数据异常！");
         });
     },
-    handleSizeChange(size) {
-      this.pageSize = size;
-      this.getData(this.currentPage, size);
+    fileterDevice() {
+      this.head.deviceData = [];
+      this.head.deviceId = null;
+      for (let device of this.deviceData) {
+        if (this.head.institutionId == device.id) {
+          this.head.deviceData.push(device);
+        }
+      }
+      if (this.head.deviceData.length > 0) {
+        this.head.deviceId = this.head.deviceData[0].value;
+      }
+      this.filterThing();
     },
-    handleCurrentChange(currentPage) {
-      this.currentPage = currentPage;
-      this.getData(currentPage, this.pageSize);
+    filterThing() {
+      this.head.thingData = [];
+      this.head.thingCode = null;
+
+      for (let thing of this.thingData) {
+        let status = false;
+        for (let deviceThing of this.deviceThingData) {
+          if (
+            this.head.deviceId == deviceThing.deviceId &&
+            deviceThing.thingId == thing.id
+          ) {
+            status = true;
+            break;
+          }
+        }
+        if (status) {
+          this.head.thingData.push(thing);
+        }
+      }
+      if (this.head.thingData.length > 0) {
+        this.head.thingCode = this.head.thingData[0].value;
+      }
     },
-    getData(currentPage, pageSize) {
-      let index = (currentPage - 1) * pageSize;
-      this.tableData = this.allTableData.slice(index, index + pageSize);
-    },
-    queryByHeadByDeviceCode() {},
-    queryByDeviceCodeAndTime() {},
     myEcharts() {
       var myChart = this.$echarts.init(document.getElementById("main"));
       var option = {
@@ -174,7 +189,7 @@ export default {
     }
   },
   mounted() {
-    this.myEcharts();
+    this.init();
   }
 };
 </script>
