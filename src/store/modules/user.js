@@ -13,11 +13,11 @@ const mutations = {
 
 const actions = {
   login({ commit }, userInfo) {
-    const { username, password, validCode } = userInfo;
+    const { userCode, userPassword, validCode } = userInfo;
     return new Promise((resolve, reject) => {
       login({
-        username: username.trim(),
-        password: password,
+        userCode: userCode.trim(),
+        userPassword: userPassword,
         validCode: validCode
       })
         .then(response => {

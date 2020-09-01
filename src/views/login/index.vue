@@ -38,12 +38,12 @@
             <div class="form-message"></div>
           </li>
           <li>
-            <input type="text" v-model="loginForm.username" class="loginuser" />
+            <input type="text" v-model="loginForm.userCode" class="loginuser" />
           </li>
           <li>
             <input
               type="password"
-              v-model="loginForm.password"
+              v-model="loginForm.userPassword"
               class="loginpwd"
               @keyup.enter="logins"
             />
@@ -85,8 +85,8 @@ export default {
   data() {
     return {
       loginForm: {
-        username: "",
-        password: "",
+        userCode: "",
+        userPassword: "",
         validCode: ""
       },
       redirect: undefined,
@@ -121,7 +121,10 @@ export default {
   },
   methods: {
     logins: function() {
-      if (this.loginForm.username === "" || this.loginForm.password === "") {
+      if (
+        this.loginForm.userCode === "" ||
+        this.loginForm.userPassword === ""
+      ) {
         this.$message.error("账号或密码不能为空");
         return;
       }
