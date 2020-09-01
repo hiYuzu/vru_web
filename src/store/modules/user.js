@@ -1,4 +1,4 @@
-import { login, logout } from "@/api/user";
+import { login, logout, getVaildCode } from "@/api/user";
 import { getToken, setToken, removeToken } from "@/utils/auth";
 
 const state = {
@@ -13,10 +13,13 @@ const mutations = {
 
 const actions = {
   login({ commit }, userInfo) {
-    debugger;
-    const { username, password } = userInfo;
+    const { username, password, validCode } = userInfo;
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password })
+      login({
+        username: username.trim(),
+        password: password,
+        validCode: validCode
+      })
         .then(response => {
           const { status, msg, data } = response.data;
           if (status) {
@@ -52,6 +55,24 @@ const actions = {
       commit("SET_TOKEN", "");
       removeToken();
       resolve();
+    });
+  },
+  //获取验证码
+  getVaildCode() {
+    return new Promise((resolve, reject) => {
+      getVaildCode()
+        .then(response => {
+          const { status, data } = response;
+          if (status) {
+            resolve(data);
+          } else {
+            reject("获取验证码失败");
+          }
+        })
+        .catch(error => {
+          console.info(error);
+          reject(error);
+        });
     });
   }
 };

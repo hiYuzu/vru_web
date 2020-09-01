@@ -97,7 +97,8 @@ export default {
     return {
       loginForm: {
         username: "",
-        password: ""
+        password: "",
+        validCode: ""
       },
       redirect: undefined,
       otherQuery: {},
@@ -133,6 +134,11 @@ export default {
     logins: function() {
       if (this.loginForm.username === "" || this.loginForm.password === "") {
         this.$message.error("账号或密码不能为空");
+        return;
+      }
+      if (this.loginForm.validCode === "") {
+        this.$message.error("请拖住滑块，拖动到最右边，进行验证");
+        return;
       } else {
         this.$store
           .dispatch("user/login", this.loginForm)
@@ -172,7 +178,16 @@ export default {
       this.offsetbg += 0.9;
     },
     onMpanelError() {},
-    onMpanelSuccess() {}
+    onMpanelSuccess() {
+      this.$store
+        .dispatch("user/getVaildCode", this.loginForm)
+        .then(res => {
+          this.loginForm.validCode = res;
+        })
+        .catch(error => {
+          this.$message.error(error);
+        });
+    }
   }
 };
 </script>
