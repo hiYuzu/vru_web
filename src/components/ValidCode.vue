@@ -5,7 +5,7 @@
         @mousedown="rangeMove"
         :class="rangeStatus ? successIcon : startIcon"
       ></i>
-      {{ rangeStatus ? successText : startText }}
+      <span class="txt">{{ rangeStatus ? successText : startText }}</span>
     </div>
   </div>
 </template>
@@ -106,6 +106,22 @@ export default {
   align-items: center;
 }
 .jc-component__range {
+  .txt {
+    background: -webkit-gradient(
+      linear,
+      left top,
+      right top,
+      color-stop(0, #4d4d4d),
+      color-stop(0.4, #4d4d4d),
+      color-stop(0.5, #fff),
+      color-stop(0.6, #4d4d4d),
+      color-stop(1, #4d4d4d)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-animation: slidetounlock 3s infinite;
+    -webkit-text-size-adjust: none;
+  }
   .jc-range {
     background-color: #e9e9e9;
     position: relative;
@@ -120,6 +136,11 @@ export default {
       i {
         color: #3bc923;
       }
+      .txt {
+        background: transparent;
+        -webkit-animation-play-state: paused;
+        -webkit-text-fill-color: #fff;
+      }
     }
     i {
       position: absolute;
@@ -133,6 +154,16 @@ export default {
       font-size: 24px;
       @include jc-flex;
     }
+  }
+}
+
+@keyframes slidetounlock {
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: 200px 0;
   }
 }
 </style>

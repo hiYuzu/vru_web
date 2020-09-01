@@ -28,7 +28,10 @@
           </a>
         </div>
         <ul>
-          <li data-v-37dfd6fc="" style="color:#426666;;font-weight:bold;">
+          <li
+            data-v-37dfd6fc=""
+            style="color:#426666;;font-weight:bold;margin-bottom:5px;"
+          >
             <label>用户登录</label>
           </li>
           <li>
@@ -51,22 +54,8 @@
               :successFun="onMpanelSuccess"
               :errorFun="onMpanelError"
             ></valid-code>
-            <!--  <div id="drag_bg"></div>
-            <div id="drag_box"></div>
-            <div id="drag_txt">
-              <span class="startTxt" id="startTxt"
-                >请按住滑块，拖动到最右边</span
-              >
-              <input
-                type="text"
-                value=""
-                name="code"
-                id="code"
-                hidden="hidden"
-              />
-            </div> -->
           </li>
-          <li>
+          <li style="margin-top:30px;">
             <button type="submit" class="loginbtn" @click="logins">
               登录
             </button>
@@ -314,7 +303,7 @@ img {
           }
           .loginbtn {
             width: 299px;
-            height: 35px;
+            height: 40px;
             /*       background: url(~@/assets/images/login/buttonbg.png) repeat-x; */
             /*  background: #6e9ef8; */
             background: #426666;
@@ -322,7 +311,7 @@ img {
             font-weight: bold;
             color: #fff;
             cursor: pointer;
-            line-height: 35px;
+            line-height: 40px;
             border: none;
           }
         }
