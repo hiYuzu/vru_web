@@ -26,7 +26,25 @@ const routes = [
   },
   {
     path: "/",
-    component: () => import("@/views/home/index")
+    component: () => import("@/views/home/index"),
+    children: [
+      {
+        path: "realMonitor",
+        name: "realMonitor",
+        component: () => import("@/views/home/realMonitor"),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: "queryData",
+        name: "queryData",
+        component: () => import("@/views/home/queryData"),
+        meta: {
+          requiresAuth: true
+        }
+      }
+    ]
   },
   {
     path: "*",
