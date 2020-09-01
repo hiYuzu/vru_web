@@ -107,7 +107,7 @@
 
 <script>
 import tlTable from "@/components/TableNoPage.vue";
-import { historyHeadInit } from "@/api/user";
+import { historyHeadInit, historyQuery } from "@/api/user";
 
 export default {
   name: "PmStatistic",
@@ -181,7 +181,44 @@ export default {
         });
     },
     query() {
-      console.info("query");
+      if (this.head.time == "") {
+        alert("选择时间");
+        return;
+      }
+      if (this.head.deviceId == null) {
+        alert("选择设备");
+        return;
+      }
+      this.currentPage = 1;
+      this.pageSize = 10;
+      if (this.head.deviceId == null || this.head.thingCode.length == 0) {
+        alert("选择监测物");
+        return;
+      }
+      let deviceIds = Array.of(this.head.deviceId);
+      let thingCodes = this.head.thingCode;
+      let dataType = this.head.dataType;
+      let time = this.head.time;
+      let param = {
+        deviceIds,
+        thingCodes,
+        dataType,
+        time
+      };
+      historyQuery(param)
+        .then(res => {
+          const { data } = res.data;
+          this.allTableData = data;
+          if (data) {
+            this.total = this.allTableData.length;
+          } else {
+            this.total = 0;
+          }
+          this.getData(this.currentPage, this.pageSize);
+        })
+        .catch(() => {
+          this.$message.error("查询表格异常！");
+        });
     },
     handleSizeChange(size) {
       this.pageSize = size;
@@ -193,7 +230,11 @@ export default {
     },
     getData(currentPage, pageSize) {
       let index = (currentPage - 1) * pageSize;
-      this.tableData = this.allTableData.slice(index, index + pageSize);
+      if (this.allTableData) {
+        this.tableData = this.allTableData.slice(index, index + pageSize);
+      } else {
+        this.tableData = [];
+      }
     },
     fileterDevice() {
       this.head.deviceData = [];
