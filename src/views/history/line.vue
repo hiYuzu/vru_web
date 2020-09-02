@@ -135,7 +135,7 @@ export default {
         return;
       }
       let deviceIds = Array.of(this.head.deviceId);
-      let thingCodes = this.head.thingCode;
+      let thingCodes = Array.of(this.head.thingCode);
       let dataType = this.head.dataType;
       let time = this.head.time;
       let param = {
