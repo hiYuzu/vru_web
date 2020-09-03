@@ -48,15 +48,16 @@ export default {
           url: "realMonitor"
         },
         {
-          id: "queryData",
+          id: "table",
           name: "数据查询",
           icon: require("../assets/images/home/sjsh.png"),
-          url: "queryData"
+          url: "table"
         },
         {
-          id: "dataTrend",
+          id: "line",
           name: "数据分析",
-          icon: require("../assets/images/home/dbfx.png")
+          icon: require("../assets/images/home/dbfx.png"),
+          url: "line"
         }
       ]
     };

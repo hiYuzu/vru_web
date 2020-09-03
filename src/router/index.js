@@ -13,14 +13,6 @@ const routes = [
     component: () => import("@/views/login/index")
   },
   {
-    path: "/table",
-    component: () => import("@/views/history/table")
-  },
-  {
-    path: "/line",
-    component: () => import("@/views/history/line")
-  },
-  {
     path: "/401",
     component: () => import("@/views/errorPage/401")
   },
@@ -37,9 +29,17 @@ const routes = [
         }
       },
       {
-        path: "queryData",
-        name: "queryData",
-        component: () => import("@/views/queryData/index"),
+        path: "line",
+        name: "line",
+        component: () => import("@/views/history/line"),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: "table",
+        name: "table",
+        component: () => import("@/views/history/table"),
         meta: {
           requiresAuth: true
         }
