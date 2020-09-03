@@ -151,9 +151,9 @@ export default {
     },
     resetChart4() {
       let param = {
-        warnAlarm = this.warn_alarm,
-        timeRange = this.timeRange
-      }
+        warnAlarm: this.warn_alarm,
+        timeRange: this.timeRange
+      };
       alarmRank(param)
         .then(response => {
           if (response.data.status) {
