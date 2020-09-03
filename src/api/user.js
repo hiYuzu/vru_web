@@ -20,3 +20,4 @@ export const onLineStatistic = () => post("onLineStatistic", null);
 export const offLineStatistic = () => post("offLineStatistic", null);
 export const alarmRank = params => post("alarmRank", params);
 //TODO..
+export const mapPointsQuery = () => post("getMapPoint", null);
