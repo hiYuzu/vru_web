@@ -112,6 +112,9 @@ export default {
   watch: {
     timeRange: function() {
       this.resetChart4();
+    },
+    warn_alarm: function() {
+      this.resetChart4();
     }
   },
   methods: {
