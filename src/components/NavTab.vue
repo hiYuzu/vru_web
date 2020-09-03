@@ -86,8 +86,6 @@ export default {
   },
   watch: {
     getOpenedTab(val) {
-      alert("cc");
-      debugger;
       if (val.length > this.openedTab.length) {
         // 添加了新的tab页
         // 导致$store.state中的openedTab长度
