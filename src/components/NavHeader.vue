@@ -11,38 +11,16 @@
     </div>
     <div class="header_menu">
       <ul>
-        <li class="list" @click="clickMenu('realMonitor')">
-          <router-link :to="{ name: 'realMonitor' }">
+        <li class="list" v-for="item in menus" :key="item.id">
+          <a @click="clickMenu(item)">
             <img
-              src="../assets/images/home/RealMonitoring.png"
-              style="width: 32px; height: 32px"
-            /><br />实时监测
-          </router-link>
-        </li>
-
-        <li class="list" style="display: inline">
-          <router-link :to="{ name: 'dataAud' }">
-            <img
-              src="../assets/images/home/sjsh.png"
-              style="width: 32px; height: 32px"
-            /><br />数据查询
-          </router-link>
-        </li>
-        <li class="list" style="display: inline">
-          <router-link :to="{ name: 'home' }">
-            <img
-              src="../assets/images/home/dbfx.png"
-              style="width: 32px; height: 32px"
-            /><br />数据分析
-          </router-link>
-        </li>
-        <li class="list" style="display: none">
-          <router-link :to="{ name: 'home' }">
-            <img
-              src="../assets/images/home/Accueil.png"
-              style="width: 32px; height: 32px"
-            /><br />帮助中心
-          </router-link>
+              :src="item.icon"
+              style="width:
+            32px; height: 32px"
+            />
+            <br />
+            {{ item.name }}
+          </a>
         </li>
         <li class="list" @click="logout">
           <a>
@@ -61,7 +39,26 @@ export default {
   name: "NavHeader",
   data() {
     return {
-      openedTab: []
+      openedTab: [],
+      menus: [
+        {
+          id: "realMonitor",
+          name: "实时数据",
+          icon: require("../assets/images/home/RealMonitoring.png"),
+          url: "realMonitor"
+        },
+        {
+          id: "queryData",
+          name: "数据查询",
+          icon: require("../assets/images/home/sjsh.png"),
+          url: "queryData"
+        },
+        {
+          id: "dataTrend",
+          name: "数据分析",
+          icon: require("../assets/images/home/dbfx.png")
+        }
+      ]
     };
   },
   methods: {
@@ -69,17 +66,24 @@ export default {
       removeToken();
       this.$router.push("/login");
     },
-    clickMenu(componentName) {
-      this.openedTab = this.$store.state.openedTab;
+    clickMenu(item) {
+      debugger;
+      let title = item.id;
+      this.openedTab = this.$store.state.tab.openedTab;
+      this.$router.push({ path: item.url });
       // tabNum 为当前点击的列表项在openedTab中的index，若不存在则为-1
-      let tabNum = this.openedTab.indexOf(componentName);
+      let tabNum = this.openedTab.indexOf(title);
+      console.log(tabNum);
+      console.log(this.openedTab);
+      console.log(this.$store.state.tab.openedTab);
       if (tabNum === -1) {
+        var param = { name: item.id, title: item.name };
         // 该标签当前没有打开
         // 将componentName加入到已打开标签页state.openedTab数组中
-        this.$store.commit("addTab", componentName);
+        this.$store.commit("tab/addTab", param);
       } else {
         // 该标签是已经打开过的，需要激活此标签页
-        this.$store.commit("changeTab", componentName);
+        this.$store.commit("tab/changeTab", title);
       }
     }
   }

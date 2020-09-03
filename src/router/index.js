@@ -31,7 +31,7 @@ const routes = [
       {
         path: "realMonitor",
         name: "realMonitor",
-        component: () => import("@/views/home/realMonitor"),
+        component: () => import("@/views/realMonitor/index"),
         meta: {
           requiresAuth: true
         }
@@ -39,7 +39,7 @@ const routes = [
       {
         path: "queryData",
         name: "queryData",
-        component: () => import("@/views/home/queryData"),
+        component: () => import("@/views/queryData/index"),
         meta: {
           requiresAuth: true
         }
