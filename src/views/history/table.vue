@@ -64,6 +64,7 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         class="marginLeft"
+        value-format="yyyy-MM-mm HH:mm:ss"
       >
       </el-date-picker>
       <el-button type="primary" icon="el-icon-search" size="mini" @click="query"
@@ -73,7 +74,7 @@
         type="primary"
         icon="el-icon-receiving"
         size="mini"
-        @click="fileterDevice"
+        @click="exportExcel"
         >导出到Excel
       </el-button>
     </div>
@@ -142,12 +143,20 @@ export default {
       height: 620,
       theadBody: [
         {
-          prop: "deviceName",
-          text: "设备名称"
+          prop: "institutionName",
+          text: "发油库名称"
         },
         {
-          prop: "thingCode",
-          text: "设备编号"
+          prop: "deviceName",
+          text: "发油设备名称"
+        },
+        {
+          prop: "thingName",
+          text: "监测物"
+        },
+        {
+          prop: "dataTypeName",
+          text: "数据类型"
         },
         {
           prop: "thingAvg",
@@ -181,18 +190,11 @@ export default {
         });
     },
     query() {
-      if (this.head.time == "") {
-        alert("选择时间");
-        return;
-      }
-      if (this.head.deviceId == null) {
-        alert("选择设备");
-        return;
-      }
       this.currentPage = 1;
       this.pageSize = 10;
-      if (this.head.deviceId == null || this.head.thingCode.length == 0) {
-        alert("选择监测物");
+      this.total = 0;
+      this.allTableData = [];
+      if (!this.checkFormField()) {
         return;
       }
       let deviceIds = Array.of(this.head.deviceId);
@@ -211,14 +213,64 @@ export default {
           this.allTableData = data;
           if (data) {
             this.total = this.allTableData.length;
-          } else {
-            this.total = 0;
           }
+          this.addField();
           this.getData(this.currentPage, this.pageSize);
         })
         .catch(() => {
           this.$message.error("查询表格异常！");
         });
+    },
+    exportExcel() {
+      var wb = this.$XLSX.utils.book_new();
+      var tableArr = [
+        {
+          institutionName: "发油库名称",
+          deviceName: "发油设备名称",
+          thingName: "监测物",
+          dataTypeName: "数据类型",
+          thingAvg: "平均值",
+          beginTime: "开始时间"
+        }
+      ];
+      this.allTableData.forEach(item => {
+        tableArr.push({
+          institutionName: item.institutionName,
+          deviceName: item.deviceName,
+          thingName: item.thingName,
+          dataTypeName: item.dataTypeName,
+          thingAvg: item.thingAvg,
+          beginTime: item.beginTime
+        });
+      });
+      var ws = this.$XLSX.utils.json_to_sheet(tableArr, {
+        header: [
+          "institutionName",
+          "deviceName",
+          "thingName",
+          "dataTypeName",
+          "thingAvg",
+          "beginTime"
+        ],
+        skipHeader: true
+      });
+      this.$XLSX.utils.book_append_sheet(wb, ws, "sheetName");
+      var wbout = this.$XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
+      });
+      try {
+        this.$FileSaver.saveAs(
+          new Blob([wbout], {
+            type: "application/octet-stream"
+          }),
+          "历史数据统计.xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
     },
     handleSizeChange(size) {
       this.pageSize = size;
@@ -271,6 +323,55 @@ export default {
       if (this.head.thingData.length > 0) {
         this.head.thingCode[0] = this.head.thingData[0].value;
       }
+    },
+    addField() {
+      let institutionName;
+      for (let institution of this.head.institutionData) {
+        if (this.head.institutionId == institution.value) {
+          institutionName = institution.label;
+          break;
+        }
+      }
+      for (let table of this.allTableData) {
+        table.institutionName = institutionName;
+        for (let device of this.deviceData) {
+          if (table.deviceId == device.value) {
+            table.deviceName = device.label;
+            break;
+          }
+        }
+        for (let thing of this.thingData) {
+          if (table.thingCode == thing.value) {
+            table.thingName = thing.label;
+            break;
+          }
+        }
+        for (let dataType of this.dataTypeData) {
+          if (table.dataType == dataType.value) {
+            table.dataTypeName = dataType.label;
+            break;
+          }
+        }
+      }
+    },
+    checkFormField() {
+      if (!this.head.institutionId) {
+        alert("选择发油库");
+        return false;
+      }
+      if (!this.head.deviceId) {
+        alert("选择设备");
+        return false;
+      }
+      if (this.head.thingCode.length == 0) {
+        alert("选择监测物");
+        return false;
+      }
+      if (this.head.time == "") {
+        alert("选择时间");
+        return false;
+      }
+      return true;
     }
   }
 };

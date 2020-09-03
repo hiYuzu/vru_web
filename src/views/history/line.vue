@@ -58,21 +58,11 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         class="marginLeft"
+        value-format="yyyy-MM-mm HH:mm:ss"
       >
       </el-date-picker>
-      <el-button
-        type="primary"
-        icon="el-icon-search"
-        size="mini"
-        @click="fileterDevice"
+      <el-button type="primary" icon="el-icon-search" size="mini" @click="query"
         >搜索
-      </el-button>
-      <el-button
-        type="primary"
-        icon="el-icon-receiving"
-        size="mini"
-        @click="fileterDevice"
-        >导出到Excel
       </el-button>
     </div>
     <div class="pmClass">
@@ -80,17 +70,25 @@
         <div class="box-header">
           <h3 class="box-title">历史统计数据</h3>
         </div>
-        <div id="main" style="width:100%;height:400px;"></div>
+        <line-echart
+          :xAxisData="xAxisData"
+          :seriesData="seriesData"
+          :top="35"
+          :bottom="5"
+          :height="280"
+        ></line-echart>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { historyHeadInit } from "@/api/user";
+import lineEchart from "@/components/LineEcharts";
+import { historyHeadInit, historyQuery } from "@/api/user";
 
 export default {
   name: "historyLine",
+  components: { lineEchart },
   data() {
     return {
       head: {
@@ -132,6 +130,29 @@ export default {
           this.$message.error("查询数据异常！");
         });
     },
+    query() {
+      if (!this.checkFormField()) {
+        return;
+      }
+      let deviceIds = Array.of(this.head.deviceId);
+      let thingCodes = Array.of(this.head.thingCode);
+      let dataType = this.head.dataType;
+      let time = this.head.time;
+      let param = {
+        deviceIds,
+        thingCodes,
+        dataType,
+        time
+      };
+      historyQuery(param)
+        .then(res => {
+          const { data } = res.data;
+          console.info(data);
+        })
+        .catch(() => {
+          this.$message.error("查询表格异常！");
+        });
+    },
     fileterDevice() {
       this.head.deviceData = [];
       this.head.deviceId = null;
@@ -168,24 +189,24 @@ export default {
         this.head.thingCode = this.head.thingData[0].value;
       }
     },
-    myEcharts() {
-      var myChart = this.$echarts.init(document.getElementById("main"));
-      var option = {
-        xAxis: {
-          type: "category",
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        },
-        yAxis: {
-          type: "value"
-        },
-        series: [
-          {
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
-            type: "line"
-          }
-        ]
-      };
-      myChart.setOption(option);
+    checkFormField() {
+      if (!this.head.institutionId) {
+        alert("选择发油库");
+        return false;
+      }
+      if (!this.head.deviceId) {
+        alert("选择设备");
+        return false;
+      }
+      if (!this.head.thingCode) {
+        alert("选择监测物");
+        return false;
+      }
+      if (this.head.time == "") {
+        alert("选择时间");
+        return false;
+      }
+      return true;
     }
   },
   mounted() {
