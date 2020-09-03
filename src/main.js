@@ -12,10 +12,16 @@ import "echarts/lib/chart/line";
 import "echarts/lib/chart/bar";
 import "echarts/lib/chart/pie";
 import "echarts/theme/macarons";
+import FileSaver from "file-saver";
+import XLSX from "xlsx";
+
 Vue.use(Element);
 Vue.use(VueBus);
 Vue.use(Echarts);
 Vue.config.productionTip = false;
+Vue.prototype.$echarts = Echarts;
+Vue.prototype.$FileSaver = FileSaver;
+Vue.prototype.$XLSX = XLSX;
 
 new Vue({
   router,

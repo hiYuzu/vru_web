@@ -18,7 +18,33 @@ const routes = [
   },
   {
     path: "/",
-    component: () => import("@/views/home/index")
+    component: () => import("@/views/home/index"),
+    children: [
+      {
+        path: "realMonitor",
+        name: "realMonitor",
+        component: () => import("@/views/realMonitor/index"),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: "line",
+        name: "line",
+        component: () => import("@/views/history/line"),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: "table",
+        name: "table",
+        component: () => import("@/views/history/table"),
+        meta: {
+          requiresAuth: true
+        }
+      }
+    ]
   },
   {
     path: "*",

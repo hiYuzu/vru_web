@@ -10,11 +10,14 @@
         class="cloud"
       ></div>
     </div>
-    <div class="logintop">
+    <!--   <div class="logintop">
       <span>欢迎登录油气回收在线监测系统</span>
-    </div>
+    </div> -->
     <div class="loginbody">
       <span style="height: 100px"></span>
+      <div class="logintop">
+        <span>欢迎登录油气回收在线监测系统</span>
+      </div>
       <div class="loginbox">
         <div class="twobar">
           <a href="javascript:;" class="twobar-item twobar-item-android"
@@ -25,21 +28,34 @@
           </a>
         </div>
         <ul>
+          <li
+            data-v-37dfd6fc=""
+            style="color:#426666;;font-weight:bold;margin-bottom:5px;"
+          >
+            <label>用户登录</label>
+          </li>
           <li>
             <div class="form-message"></div>
           </li>
           <li>
-            <input type="text" v-model="loginForm.username" class="loginuser" />
+            <input type="text" v-model="loginForm.userCode" class="loginuser" />
           </li>
           <li>
             <input
               type="password"
-              v-model="loginForm.password"
+              v-model="loginForm.userPassword"
               class="loginpwd"
               @keyup.enter="logins"
             />
           </li>
-          <li>
+          <li id="drag_wrap" class="fm-item">
+            <valid-code
+              status="status"
+              :successFun="onMpanelSuccess"
+              :errorFun="onMpanelError"
+            ></valid-code>
+          </li>
+          <li style="margin-top:30px;">
             <button type="submit" class="loginbtn" @click="logins">
               登录
             </button>
@@ -55,23 +71,34 @@
 
 <script>
 import { getToken } from "@/utils/auth";
-
+import ValidCode from "./../../components/ValidCode.vue";
+var checkStatus = (rule, value, callback) => {
+  console.log(value);
+  if (!value) {
+    return callback(new Error("请拖动滑块完成验证"));
+  } else {
+    callback();
+  }
+};
 export default {
   name: "Login",
   data() {
     return {
       loginForm: {
-        username: "",
-        password: ""
+        userCode: "",
+        userPassword: "",
+        validCode: ""
       },
       redirect: undefined,
       otherQuery: {},
       offset1: 450,
       offset2: 0,
       offsetbg: 0,
-      mainwidth: 1600
+      mainwidth: 1600,
+      status: [{ validator: checkStatus, trigger: "change" }]
     };
   },
+  components: { ValidCode },
   watch: {
     $route: {
       handler: function(route) {
@@ -89,13 +116,21 @@ export default {
     if (token) {
       this.$router.push("/");
     }
-    setInterval(this.cloud1, 70);
-    setInterval(this.cloud2, 90);
+    /*  setInterval(this.cloud1, 70);
+    setInterval(this.cloud2, 90); */
   },
   methods: {
     logins: function() {
-      if (this.loginForm.username === "" || this.loginForm.password === "") {
+      if (
+        this.loginForm.userCode === "" ||
+        this.loginForm.userPassword === ""
+      ) {
         this.$message.error("账号或密码不能为空");
+        return;
+      }
+      if (this.loginForm.validCode === "") {
+        this.$message.error("请拖住滑块，拖动到最右边，进行验证");
+        return;
       } else {
         this.$store
           .dispatch("user/login", this.loginForm)
@@ -133,6 +168,17 @@ export default {
         this.offsetbg = -580;
       }
       this.offsetbg += 0.9;
+    },
+    onMpanelError() {},
+    onMpanelSuccess() {
+      this.$store
+        .dispatch("user/getVaildCode", this.loginForm)
+        .then(res => {
+          this.loginForm.validCode = res;
+        })
+        .catch(error => {
+          this.$message.error(error);
+        });
     }
   }
 };
@@ -157,11 +203,11 @@ img {
 }
 
 #login {
-  background: {
+  /* background: {
     color: #5f89f7;
     image: url(~@/assets/images/login/light.png);
     repeat: no-repeat;
-  }
+  } */
   height: 100%;
   display: flex;
   overflow: hidden;
@@ -186,8 +232,9 @@ img {
   .logintop {
     height: 47px;
     position: absolute;
-    top: 0px;
-    background: url(~@/assets/images/login/loginbg1.png) repeat-x;
+    top: 12.7%;
+    /*  background: url(~@/assets/images/login/loginbg1.png) repeat-x; */
+    background: #426666;
     z-index: 100;
     width: 100%;
     span {
@@ -200,7 +247,8 @@ img {
     }
   }
   .loginbody {
-    background: url(~@/assets/images/login/loginbg3.png) no-repeat center center;
+    background: url(~@/assets/images/login/bg-login-1.jpg) no-repeat center
+      center;
     width: 100%;
     height: 685px;
     overflow: hidden;
@@ -218,10 +266,14 @@ img {
     .loginbox {
       width: 850px;
       height: 500px;
-      background: url(~@/assets/images/login/logininfo2.png) no-repeat;
+      /*   background: url(~@/assets/images/login/logininfo2.png) no-repeat; */
       ul {
-        margin-top: 200px;
-        margin-left: 435px;
+        margin-top: 50px;
+        margin-left: 475px;
+        padding: 30px;
+        border-radius: 10px;
+        background: rgba(221, 235, 199, 0.4);
+        box-shadow: 0px 0px 20px 8px #b5b5b5;
         li {
           margin-bottom: 25px;
           .form-message {
@@ -253,14 +305,16 @@ img {
             color: #90a2bc;
           }
           .loginbtn {
-            width: 111px;
-            height: 35px;
-            background: url(~@/assets/images/login/buttonbg.png) repeat-x;
+            width: 299px;
+            height: 40px;
+            /*       background: url(~@/assets/images/login/buttonbg.png) repeat-x; */
+            /*  background: #6e9ef8; */
+            background: #426666;
             font-size: 14px;
             font-weight: bold;
             color: #fff;
             cursor: pointer;
-            line-height: 35px;
+            line-height: 40px;
             border: none;
           }
         }
@@ -298,10 +352,11 @@ img {
 }
 .twobar {
   display: block;
-  position: fixed;
+  position: absolute;
   z-index: 999999999;
   right: 1px;
-  top: 0;
+  top: 12.5%;
+  margin-right: -6px;
   cursor: pointer;
   transition: all 0.3s ease;
 } /*假设网页宽度为1200px，导航条在右侧悬浮*/
@@ -337,7 +392,7 @@ img {
 .twobar-layer {
   position: absolute;
   right: -10px;
-  bottom: -243px;
+  bottom: -300px; /* -243px; */
   width: 172px;
   opacity: 0;
   filter: alpha(opacity=0);
@@ -356,5 +411,13 @@ img {
   -ms-transition: all 1s;
   -o-transition: all 1s;
   -webkit-transition: all 1s;
+}
+
+#drag_wrap {
+  width: 300px; /*300px*/
+  height: 35px;
+  position: relative;
+  background: #e8e8e8;
+  margin: 20px 0px; /*300px auto*/
 }
 </style>
