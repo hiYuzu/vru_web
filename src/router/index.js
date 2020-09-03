@@ -23,6 +23,14 @@ const routes = [
   {
     path: "*",
     component: () => import("@/views/errorPage/404")
+  },
+  {
+    path: "/alarmData",
+    component: () => import("@/views/alarmData/index")
+  },
+  {
+    path: "/alarmStat",
+    component: () => import("@/views/alarmStatistic/index")
   }
 ];
 
