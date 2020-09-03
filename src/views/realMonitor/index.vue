@@ -4,6 +4,7 @@
   </div>
 </template>
 <script>
+import { mapPointsQuery } from "@/api/user";
 export default {
   name: "realMonitor",
   data() {
@@ -11,6 +12,7 @@ export default {
   },
   mounted() {
     this.baiduMap();
+    this.getMapPoint();
   },
   methods: {
     baiduMap() {
@@ -26,6 +28,46 @@ export default {
         })
       );
       this.map.clearOverlays();
+    },
+    //查询地图上的点位信息
+    getMapPoint() {
+      let that = this;
+      mapPointsQuery()
+        .then(res => {
+          if (res.status) {
+            const { data } = res.data;
+            console.info(data.length);
+            debugger;
+            for (let i = 0; i < data.length; i++) {
+              if (i == 0) {
+                data[i].alarmCount = 0;
+                data[i].warnCount = 3;
+              }
+              if (i == 2) {
+                data[i].alarmCount = 0;
+                data[i].warnCount = 0;
+              }
+              that.addMarker(data[i]);
+            }
+          }
+        })
+        .catch(() => {
+          //this.$message.error("查询地图上的数据异常！");
+        });
+    },
+    addMarker(data) {
+      let image = "";
+      let point = new window.BMap.Point(data.mapX, data.mapY);
+      if (data.alarmCount > 0) {
+        image = require("../../assets/images/realMonitor/alarm.gif");
+      } else if (data.warnCount > 0) {
+        image = require("../../assets/images/realMonitor/warning.gif");
+      } else {
+        image = require("../../assets/images/realMonitor/normal.png");
+      }
+      let myIcon = new window.BMap.Icon(image, new window.BMap.Size(300, 157));
+      let marker = new window.BMap.Marker(point, { icon: myIcon }); // 创建标注
+      this.map.addOverlay(marker);
     }
   }
 };
