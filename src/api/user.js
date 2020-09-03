@@ -13,8 +13,8 @@ export const getAuthorityDeviceHead = params =>
 export const exportExcel = params => post("exportExcel", params);
 export const getAlarmShowDataCount = params =>
   post("getAlarmShowDataCount", params);
-//报警统计
 export const getAlarmShowData = params => post("getAlarmShowData", params);
+//报警统计
 export const onOffLineStatistic = () => post("onOffLineStatistic", null);
 export const onLineStatistic = () => post("onLineStatistic", null);
 export const offLineStatistic = () => post("offLineStatistic", null);

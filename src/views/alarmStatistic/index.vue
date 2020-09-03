@@ -78,6 +78,12 @@
 <script>
 import PieEcharts from "./components/PieEcharts.vue";
 import BarEcharts from "./components/BarEcharts.vue";
+import {
+  onOffLineStatistic,
+  onLineStatistic,
+  offLineStatistic,
+  alarmRank
+} from "@/api/user";
 export default {
   name: "AlarmStatistic",
   components: { PieEcharts, BarEcharts },
