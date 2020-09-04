@@ -1,16 +1,23 @@
 <template>
   <div>
     <div class="baidumap" id="allmap"></div>
+    <map-dialog
+      v-show="mapDialogVisible"
+      :dialogVisible.sync="mapDialogVisible"
+    ></map-dialog>
   </div>
 </template>
 <script>
-import { mapPointsQuery } from "@/api/user";
+import { mapPointsQuery, institutionDataQuery } from "@/api/user";
+import MapDialog from "./../../components/MapDialog.vue";
 export default {
   name: "realMonitor",
   data() {
-    return { map: null };
+    return { map: null, mapDialogVisible: false };
   },
+  components: { MapDialog },
   mounted() {
+    this.mapDialogVisible = false;
     this.baiduMap();
     this.getMapPoint();
   },
@@ -55,8 +62,10 @@ export default {
           //this.$message.error("查询地图上的数据异常！");
         });
     },
+    //地图上秒点
     addMarker(data) {
       let image = "";
+      let that = this;
       let point = new window.BMap.Point(data.mapX, data.mapY);
       if (data.alarmCount > 0) {
         image = require("../../assets/images/realMonitor/alarm.gif");
@@ -68,6 +77,29 @@ export default {
       let myIcon = new window.BMap.Icon(image, new window.BMap.Size(300, 157));
       let marker = new window.BMap.Marker(point, { icon: myIcon }); // 创建标注
       this.map.addOverlay(marker);
+      marker.addEventListener(
+        "onclick",
+        function() {
+          that.bindMarkerClick(data, point);
+        },
+        false
+      );
+    },
+    //地图上的点绑定click事件
+    bindMarkerClick(data, point) {
+      debugger;
+      this.mapDialogVisible = true;
+      this.getInstitutionData(data);
+      console.info(point);
+    },
+    //获取油气处理装置信息、发油信息
+    getInstitutionData(data) {
+      var params = { institutionId: data.pointId, beginTime: "", endTime: "" };
+      institutionDataQuery(params)
+        .then(res => {
+          console.info(res);
+        })
+        .catch(() => {});
     }
   }
 };
