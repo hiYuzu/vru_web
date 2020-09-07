@@ -74,7 +74,6 @@
 import { getToken } from "@/utils/auth";
 import ValidCode from "./../../components/ValidCode.vue";
 var checkStatus = (rule, value, callback) => {
-  console.log(value);
   if (!value) {
     return callback(new Error("请拖动滑块完成验证"));
   } else {
