@@ -3,7 +3,10 @@
     <div class="baidumap" id="allmap"></div>
     <map-dialog
       v-show="mapDialogVisible"
-      :dialogVisible.sync="mapDialogVisible"
+      :dialogVisible="mapDialogVisible"
+      :monitorVOMap="monitorVOMap"
+      :oilVOList="oilVOList"
+      :alarmListInfo="alarmVOList"
     ></map-dialog>
   </div>
 </template>
@@ -13,7 +16,13 @@ import MapDialog from "./../../components/MapDialog.vue";
 export default {
   name: "realMonitor",
   data() {
-    return { map: null, mapDialogVisible: false };
+    return {
+      map: null,
+      mapDialogVisible: false,
+      monitorVOMap: [],
+      oilVOList: [],
+      alarmVOList: []
+    };
   },
   components: { MapDialog },
   mounted() {
@@ -43,8 +52,6 @@ export default {
         .then(res => {
           if (res.status) {
             const { data } = res.data;
-            console.info(data.length);
-            debugger;
             for (let i = 0; i < data.length; i++) {
               if (i == 0) {
                 data[i].alarmCount = 0;
@@ -80,26 +87,42 @@ export default {
       marker.addEventListener(
         "onclick",
         function() {
-          that.bindMarkerClick(data, point);
+          that.bindMarkerClick(data);
         },
         false
       );
     },
     //地图上的点绑定click事件
-    bindMarkerClick(data, point) {
-      debugger;
-      this.mapDialogVisible = true;
+    bindMarkerClick(data) {
+      this.mapDialogVisible = false;
       this.getInstitutionData(data);
-      console.info(point);
     },
     //获取油气处理装置信息、发油信息
-    getInstitutionData(data) {
+    async getInstitutionData(data) {
+      var that = this;
       var params = { institutionId: data.pointId, beginTime: "", endTime: "" };
-      institutionDataQuery(params)
+      await institutionDataQuery(params)
         .then(res => {
-          console.info(res);
+          const { data } = res.data;
+          that.monitorVOMap = this.handlerMonitorVOData(data.monitorVOMap);
+          that.oilVOList = data.oilVOList;
+          that.alarmVOList = data.alarmVOList;
+          that.showmapDialogVisible();
         })
         .catch(() => {});
+    },
+    //处理monitorVOMap的数据格式
+    handlerMonitorVOData(monitorVOMap) {
+      let arry = [];
+      for (let time in monitorVOMap) {
+        let infoJson = monitorVOMap[time];
+        infoJson["dataTime"] = time;
+        arry.push(infoJson);
+      }
+      return arry;
+    },
+    showmapDialogVisible() {
+      this.mapDialogVisible = true;
     }
   }
 };

@@ -5,80 +5,83 @@
     :visible.sync="visible"
     :close-on-click-modal="false"
     append-to-body
+    center
   >
-    <el-tabs type="border-card">
-      <el-tab-pane>
-        <span slot="label"><i class="el-icon-date"></i> 油气处理装置</span>
-        <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="出口NMHC浓度">
-            <el-input v-model="form.name"></el-input>
-            <span> g/m3 </span>
-          </el-form-item>
-          <el-form-item label="出口压力">
-            <el-input v-model="form.name"></el-input>
-            <span> kPa </span>
-          </el-form-item>
-          <el-form-item label="出口温度 ">
-            <el-input v-model="form.name"></el-input>
-            <span> ℃</span>
-          </el-form-item>
-          <el-form-item label="出口流量">
-            <el-input v-model="form.name"></el-input>
-            <span>m3/h </span>
-          </el-form-item>
-          <el-form-item label="进口温度">
-            <el-input v-model="form.name"></el-input>
-            <span> ℃ </span>
-          </el-form-item>
-          <el-form-item label="进口压力">
-            <el-input v-model="form.name"></el-input>
-            <span>kPa</span>
-          </el-form-item>
-          <el-form-item label="进口流量">
-            <el-input v-model="form.name"></el-input>
-            <span>m3/h</span>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
-      <el-tab-pane label="发油信息">
-        <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="发油时间">
-            <el-date-picker
-              v-model="form.time"
-              type="datetime"
-              placeholder="选择日期时间"
+    <div>
+      <el-tabs type="border-card">
+        <el-tab-pane class="tabContent">
+          <span slot="label"><i class="el-icon-date"></i> 油气处理装置</span>
+          <el-table
+            :data="tableDataVo"
+            border
+            stripe
+            height="80%"
+            style="width: 100%;position: absolute;"
+          >
+            <el-table-column
+              align="center"
+              width="160"
+              prop="dataTime"
+              label="时间"
+              fixed="true"
             >
-            </el-date-picker>
-          </el-form-item>
-          <el-form-item label="油品类型">
-            <el-input v-model="form.type"></el-input>
-          </el-form-item>
-          <el-form-item label="油品来源（炼油厂或储油库名称 ">
-            <el-input v-model="form.company"></el-input>
-          </el-form-item>
-          <el-form-item label="油品去处（加油站名称）">
-            <el-input v-model="form.station"></el-input>
-          </el-form-item>
-          <el-form-item label="发油体积">
-            <el-input v-model="form.OilVolume"></el-input>
-            <span> m3 </span>
-          </el-form-item>
-          <el-form-item label="回气体积">
-            <el-input v-model="form.returnGasVolume"></el-input>
-            <span>m3</span>
-          </el-form-item>
-          <el-form-item label="发油气液比">
-            <el-input v-model="form.name"></el-input>
-            <span>-</span>
-          </el-form-item>
-          <el-form-item label="油气收集系统压力">
-            <el-input v-model="form.name"></el-input>
-            <span>kPa</span>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
-      <el-tab-pane label="报警、预警">报警、预警</el-tab-pane>
-    </el-tabs>
+            </el-table-column>
+            <el-table-column
+              align="center"
+              v-for="item in theadBodyVo"
+              :key="item.prop"
+              :width="item.width"
+              :prop="item.prop"
+              :label="item.text"
+              :fixed="tableDataVo.length > 0 ? item.fixed : false"
+            >
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane class="tabContent">
+          <span slot="label"><i class="el-icon-date"></i>发油信息</span>
+          <el-table
+            :data="tableDataOil"
+            border
+            stripe
+            height="80%"
+            style="width: 100%;position: absolute;"
+          >
+            <el-table-column
+              align="center"
+              v-for="item in theadBodyOil"
+              :key="item.prop"
+              :width="item.width"
+              :prop="item.prop"
+              :label="item.text"
+              :fixed="tableDataOil.length > 0 ? item.fixed : false"
+            >
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane class="tabContent">
+          <span slot="label"><i class="el-icon-date"></i> 预警、报警</span>
+          <el-table
+            :data="tableDataAlarm"
+            border
+            stripe
+            height="80%"
+            style="width: 100%;position: absolute;"
+          >
+            <el-table-column
+              align="center"
+              v-for="item in theadBodyAlarm"
+              :key="item.prop"
+              :width="item.width"
+              :prop="item.prop"
+              :label="item.text"
+              :fixed="tableDataAlarm.length > 0 ? item.fixed : false"
+            >
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
   </el-dialog>
 </template>
 <script>
@@ -87,26 +90,126 @@ export default {
   data() {
     return {
       visible: this.dialogVisible,
-      form: {
-        name: "",
-        type: "",
-        company: "",
-        station: "",
-        OilVolume: "",
-        returnGasVolume: ""
-      }
+      total: 5,
+      currentPage: 1,
+      pagesize: 10,
+      pageSizes: [10, 20, 30, 40, 50],
+      tableDataVo: [],
+      tableDataOil: [],
+      tableDataAlarm: [],
+      theadBodyVo: [
+        {
+          prop: "出口NMHC浓度",
+          text: "出口NMHC浓度"
+        },
+        {
+          prop: "出口温度",
+          text: "出口温度"
+        },
+        {
+          prop: "出口压力",
+          text: "出口压力"
+        },
+        {
+          prop: "出口流量",
+          text: "出口流量"
+        },
+        {
+          prop: "进口温度",
+          text: "进口温度"
+        },
+        {
+          prop: "进口压力",
+          text: "进口压力"
+        },
+        {
+          prop: "进口流量",
+          text: "进口流量"
+        }
+      ],
+      theadBodyOil: [
+        {
+          prop: "dataId",
+          text: "dataId",
+          hidden: true
+        },
+        {
+          prop: "dataFysj",
+          text: "发油时间"
+        },
+        {
+          prop: "dataYplx",
+          text: "出口油品类型"
+        },
+        {
+          prop: "dataYply",
+          text: "油品来源"
+        },
+        {
+          prop: "dataYpqc",
+          text: "油品去处"
+        },
+        {
+          prop: "dataFytj",
+          text: "发油体积"
+        },
+        {
+          prop: "dataHqtj",
+          text: "回气体积"
+        },
+        {
+          prop: "dataFyqyb",
+          text: "发油气液比"
+        },
+        {
+          prop: "dataSjxtyl",
+          text: "油气收集系统压力"
+        }
+      ],
+      theadBodyAlarm: [
+        {
+          prop: "time",
+          text: "报警时间"
+        }
+      ]
     };
   },
-  props: ["dialogVisible"],
+  props: ["dialogVisible", "monitorVOMap", "oilVOList", "alarmListInfo"],
   watch: {
     dialogVisible: {
       handler() {
         this.visible = this.dialogVisible;
+        this.tableDataVo = this.monitorVOMap;
+        this.tableDataOil = this.oilVOList;
+        this.tableDataAlarm = this.alarmListInfo;
       },
       deep: true
     }
   },
-  mounted() {},
+  mounted() {
+    this.tableDataVo = this.monitorVOMap;
+    this.tableDataOil = this.oilVOList;
+    this.tableDataAlarm = this.alarmListInfo;
+  },
+
   methods: {}
 };
 </script>
+<style scoped>
+.el-form--inline .el-form-item::v-deep {
+  margin-right: 50px;
+}
+span.unit {
+  position: absolute;
+  float: right;
+  width: 70px;
+}
+.el-dialog-div::v-deep {
+  height: 60vh;
+  overflow: auto;
+}
+.tabContent {
+  height: 400px;
+  overflow: auto;
+}
+</style>
