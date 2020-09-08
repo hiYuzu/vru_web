@@ -39,7 +39,6 @@ export default {
   },
   methods: {
     handleClickTab(tab) {
-      console.info(tab);
       this.$store.commit("tab/changeTab", tab.name);
       this.$router.push(tab.name);
     },
@@ -72,7 +71,6 @@ export default {
   computed: {
     getOpenedTab() {
       let val = this.$store.state.tab.openedTab;
-      console.info(val);
       return val;
     },
     changeTab() {
@@ -80,7 +78,6 @@ export default {
     },
     getTitle() {
       let val = this.$store.state.tab.openedTitle;
-      console.info(val);
       return val;
     }
   },
@@ -104,7 +101,6 @@ export default {
         this.editableTabsValue = newTab;
         this.openedTab.push(newTab);
         //this.openedUrl.push(url);
-        console.info(this.route);
         //this.$router.push(this.route);
       }
     },
@@ -116,9 +112,7 @@ export default {
     },
     $route: {
       handler: function(route) {
-        console.info("wqoshi");
         console.info(route);
-        console.info("ssss");
       },
       immediate: true
     }

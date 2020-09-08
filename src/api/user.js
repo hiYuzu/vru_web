@@ -17,4 +17,8 @@ export const getAlarmShowData = params => post("getAlarmShowData", params);
 //报警统计
 export const onOffLineStatistic = () => post("onOffLineStatistic", null);
 export const alarmRank = params => post("alarmRank", params);
-//TODO..
+//获取地图上设备信息.
+export const mapPointsQuery = () => post("getMapPoint", null);
+//获取油气处理信息、报警信息
+export const institutionDataQuery = params =>
+  post("getInstitutionData", params);

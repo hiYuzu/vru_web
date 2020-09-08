@@ -28,9 +28,10 @@
           </a>
         </div>
         <ul>
+          <!-- #426666 -->
           <li
             data-v-37dfd6fc=""
-            style="color:#426666;;font-weight:bold;margin-bottom:5px;"
+            style="color:green;font-weight:bold;margin-bottom:5px;"
           >
             <label>用户登录</label>
           </li>
@@ -73,7 +74,6 @@
 import { getToken } from "@/utils/auth";
 import ValidCode from "./../../components/ValidCode.vue";
 var checkStatus = (rule, value, callback) => {
-  console.log(value);
   if (!value) {
     return callback(new Error("请拖动滑块完成验证"));
   } else {
@@ -234,7 +234,7 @@ img {
     position: absolute;
     top: 12.7%;
     /*  background: url(~@/assets/images/login/loginbg1.png) repeat-x; */
-    background: #426666;
+    background: #5a79ba /*  #426666 */;
     z-index: 100;
     width: 100%;
     span {
@@ -272,8 +272,8 @@ img {
         margin-left: 475px;
         padding: 30px;
         border-radius: 10px;
-        background: rgba(221, 235, 199, 0.4);
-        box-shadow: 0px 0px 20px 8px #b5b5b5;
+        background: rgba(221, 235, 199, 0.3);
+        box-shadow: 0px 0px 20px 4px #5a79ba /* #b5b5b5 */;
         li {
           margin-bottom: 25px;
           .form-message {
@@ -309,7 +309,7 @@ img {
             height: 40px;
             /*       background: url(~@/assets/images/login/buttonbg.png) repeat-x; */
             /*  background: #6e9ef8; */
-            background: #426666;
+            background: #5a79ba /* #426666 */;
             font-size: 14px;
             font-weight: bold;
             color: #fff;

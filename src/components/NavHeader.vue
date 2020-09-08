@@ -100,7 +100,7 @@ export default {
   display: flex;
 }
 .el-header {
-  background-color: #5f89f7;
+  background-color: #5a79ba /*  #5f89f7 */;
   height: 70px !important;
   padding: 0 0 !important;
   .hTitle {
