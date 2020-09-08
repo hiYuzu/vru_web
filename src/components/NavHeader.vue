@@ -58,6 +58,18 @@ export default {
           name: "数据分析",
           icon: require("../assets/images/home/dbfx.png"),
           url: "line"
+        },
+        {
+          id: "alarmData",
+          name: "报警分析",
+          icon: require("../assets/images/home/aInfo.png"),
+          url: "alarmData"
+        },
+        {
+          id: "alarmStatistic",
+          name: "报警分析",
+          icon: require("../assets/images/home/alarmdbfx.png"),
+          url: "alarmStatistic"
         }
       ]
     };

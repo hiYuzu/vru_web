@@ -43,6 +43,22 @@ const routes = [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: "alarmData",
+        name: "alarmData",
+        component: () => import("@/views/alarmData/index"),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: "alarmStatistic",
+        name: "alarmStatistic",
+        component: () => import("@/views/alarmStatistic/index"),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   },
