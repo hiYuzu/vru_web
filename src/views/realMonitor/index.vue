@@ -77,13 +77,13 @@ export default {
       let that = this;
       let point = new window.BMap.Point(data.mapX, data.mapY);
       if (data.alarmCount > 0) {
-        image = require("../../assets/images/realMonitor/alarm.gif");
+        image = require("../../assets/images/realMonitor/alarm1.gif");
       } else if (data.warnCount > 0) {
-        image = require("../../assets/images/realMonitor/warning.gif");
+        image = require("../../assets/images/realMonitor/warning1.gif");
       } else {
         image = require("../../assets/images/realMonitor/normal.png");
       }
-      let myIcon = new window.BMap.Icon(image, new window.BMap.Size(300, 157));
+      let myIcon = new window.BMap.Icon(image, new window.BMap.Size(47, 57));
       let marker = new window.BMap.Marker(point, { icon: myIcon }); // 创建标注
       this.map.addOverlay(marker);
       marker.addEventListener(

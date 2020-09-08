@@ -61,7 +61,7 @@ export default {
         },
         {
           id: "alarmData",
-          name: "报警分析",
+          name: "报警查询",
           icon: require("../assets/images/home/aInfo.png"),
           url: "alarmData"
         },
