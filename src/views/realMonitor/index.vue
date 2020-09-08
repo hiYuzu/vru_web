@@ -7,6 +7,7 @@
       :monitorVOMap="monitorVOMap"
       :oilVOList="oilVOList"
       :alarmListInfo="alarmVOList"
+      :dialogTitle="title"
     ></map-dialog>
   </div>
 </template>
@@ -21,7 +22,8 @@ export default {
       mapDialogVisible: false,
       monitorVOMap: [],
       oilVOList: [],
-      alarmVOList: []
+      alarmVOList: [],
+      title: ""
     };
   },
   components: { MapDialog },
@@ -101,6 +103,7 @@ export default {
     async getInstitutionData(data) {
       var that = this;
       var params = { institutionId: data.pointId, beginTime: "", endTime: "" };
+      that.title = data.pointName;
       await institutionDataQuery(params)
         .then(res => {
           const { data } = res.data;
