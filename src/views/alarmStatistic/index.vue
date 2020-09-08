@@ -66,7 +66,7 @@
           <div class="box-body">
             <bar-echarts
               :showMax="true"
-              :legendData="chart4.xAxisData"
+              :xAxisData="chart4.xAxisData"
               :seriesData="chart4.seriesData"
             ></bar-echarts>
           </div>
@@ -78,12 +78,7 @@
 <script>
 import PieEcharts from "./components/PieEcharts.vue";
 import BarEcharts from "./components/BarEcharts.vue";
-import {
-  onOffLineStatistic,
-  onLineStatistic,
-  offLineStatistic,
-  alarmRank
-} from "@/api/user";
+import { onOffLineStatistic, alarmRank } from "@/api/user";
 export default {
   name: "AlarmStatistic",
   components: { PieEcharts, BarEcharts },
@@ -92,15 +87,15 @@ export default {
       warn_alarm: "1",
       timeRange: "7",
       chart1: {
-        legendData: [],
+        legendData: ["在线", "离线"],
         seriesData: []
       },
       chart2: {
-        legendData: [],
+        legendData: ["正常", "故障"],
         seriesData: []
       },
       chart3: {
-        legendData: [],
+        legendData: ["断开连接", "其他"],
         seriesData: []
       },
       chart4: {
@@ -119,44 +114,28 @@ export default {
   },
   methods: {
     query() {
-      //图1:设备在线离线统计
       onOffLineStatistic()
         .then(response => {
           if (response.data.status) {
             let data = response.data.data;
-            this.chart1.legendData = data.legendData;
-            this.chart1.seriesData = data.seriesData;
+            this.chart1.seriesData = [
+              { name: "在线", value: data.N + data.D },
+              { name: "离线", value: data.O + data.others }
+            ];
+            this.chart2.seriesData = [
+              { name: "正常", value: data.N },
+              { name: "故障", value: data.D }
+            ];
+            this.chart3.seriesData = [
+              { name: "断开连接", value: data.O },
+              { name: "其他", value: data.others }
+            ];
           }
         })
         .catch(() => {
           this.$message.error("设备在线离线统计失败！");
         });
-      //图2：在线设备正常报警统计
-      onLineStatistic()
-        .then(response => {
-          if (response.data.status) {
-            let data = response.data.data;
-            this.chart2.legendData = data.legendData;
-            this.chart2.seriesData = data.seriesData;
-          }
-        })
-        .catch(() => {
-          this.$message.error("在线设备统计失败！");
-        });
-      //图3：离线设备状态统计
-      offLineStatistic()
-        .then(response => {
-          if (response.data.status) {
-            let data = response.data.data;
-            this.chart3.legendData = data.legendData;
-            this.chart3.seriesData = data.seriesData;
-          }
-        })
-        .catch(() => {
-          this.$message.error("离线设备统计失败！");
-        });
-      //图4：报警排名
-      this.resetChart4();
+      // this.resetChart4();
     },
     resetChart4() {
       let param = {
@@ -172,7 +151,7 @@ export default {
           }
         })
         .catch(() => {
-          this.$message.error("离线设备统计失败！");
+          this.$message.error("报警排名统计失败！");
         });
     }
   },

@@ -7,19 +7,21 @@ import router from "./router";
 import store from "./store";
 import "@/permission";
 import VueBus from "vue-bus";
-import Echarts from "echarts";
+import echarts from "echarts";
 import "echarts/lib/chart/line";
 import "echarts/lib/chart/bar";
 import "echarts/lib/chart/pie";
+import "echarts/lib/component/tooltip";
+import "echarts/lib/component/title";
+import "echarts/lib/component/legend";
 import "echarts/theme/macarons";
 import FileSaver from "file-saver";
 import XLSX from "xlsx";
 
 Vue.use(Element);
 Vue.use(VueBus);
-Vue.use(Echarts);
 Vue.config.productionTip = false;
-Vue.prototype.$echarts = Echarts;
+Vue.prototype.$echarts = echarts;
 Vue.prototype.$FileSaver = FileSaver;
 Vue.prototype.$XLSX = XLSX;
 

@@ -151,9 +151,9 @@ export default {
     }
   },
   mounted() {
-    var myChart2 = this.renderBarChart();
+    var myChart4 = this.renderBarChart();
     window.addEventListener("resize", () => {
-      myChart2.resize();
+      myChart4.resize();
     });
   }
 };

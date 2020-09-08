@@ -16,7 +16,5 @@ export const getAlarmShowDataCount = params =>
 export const getAlarmShowData = params => post("getAlarmShowData", params);
 //报警统计
 export const onOffLineStatistic = () => post("onOffLineStatistic", null);
-export const onLineStatistic = () => post("onLineStatistic", null);
-export const offLineStatistic = () => post("offLineStatistic", null);
 export const alarmRank = params => post("alarmRank", params);
 //TODO..
