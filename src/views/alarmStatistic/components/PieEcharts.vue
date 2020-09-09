@@ -20,7 +20,7 @@ export default {
     legendData: {
       type: Array,
       default: function() {
-        return ["直接访问", "邮件营销", "联盟广告", "视频广告", "搜索引擎"];
+        return ["直接访问", "邮件营销"];
       }
     },
     seriesData: {
@@ -34,18 +34,6 @@ export default {
           {
             name: "邮件营销",
             value: 310
-          },
-          {
-            name: "联盟广告",
-            value: 234
-          },
-          {
-            name: "视频广告",
-            value: 135
-          },
-          {
-            name: "搜索引擎",
-            value: 1548
           }
         ];
       }
@@ -114,7 +102,18 @@ export default {
       handler() {
         this.renderPieChart();
       }
+    },
+    legendData: {
+      handler() {
+        this.renderPieChart();
+      }
     }
+  },
+  mounted() {
+    var myChart1 = this.renderPieChart();
+    window.addEventListener("resize", () => {
+      myChart1.resize();
+    });
   }
 };
 </script>

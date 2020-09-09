@@ -36,25 +36,10 @@ export default {
       default: function() {
         return [
           {
-            name: "Forest",
+            name: "报警次数",
             type: "bar",
-            barGap: 0,
-            data: [320, 332, 301, 334, 390, 122]
-          },
-          {
-            name: "Steppe",
-            type: "bar",
-            data: [220, 182, 191, 234, 290, 55]
-          },
-          {
-            name: "Desert",
-            type: "bar",
-            data: [150, 232, 201, 154, 190, 133]
-          },
-          {
-            name: "Wetland",
-            type: "bar",
-            data: [98, 77, 101, 99, 40, 111]
+            barWidth: "60%",
+            data: [10, 52, 200, 334, 390, 330]
           }
         ];
       }
@@ -91,7 +76,6 @@ export default {
         document.getElementById(this.id),
         "macarons"
       );
-      let _this = this;
       myChart.setOption({
         title: {
           text: this.title,
@@ -122,16 +106,7 @@ export default {
           data: this.xAxisData
         },
         yAxis: {
-          type: "value",
-          max: function(value) {
-            if (_this.showMax) return value.max;
-            else return value;
-          },
-          axisLabel: {
-            formatter: function(value) {
-              return value.toFixed(2);
-            }
-          }
+          type: "value"
         },
         series: this.seriesData
       });

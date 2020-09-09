@@ -1,7 +1,6 @@
 <template>
   <div class="index_body" style="overflow-y:auto;overflow-x:hidden;">
     <div class="div_chart">
-      <!-- 设备在线离线统计 -->
       <el-col :span="12">
         <div class="body1">
           <div class="box-header">
@@ -15,7 +14,6 @@
           </div>
         </div>
       </el-col>
-      <!-- 在线设备正常报警统计 -->
       <el-col :span="12">
         <div class="body2">
           <div class="box-header">
@@ -31,7 +29,6 @@
       </el-col>
     </div>
     <div class="div_chart">
-      <!-- 离线设备状态统计 -->
       <el-col :span="12">
         <div class="body1">
           <div class="box-header">
@@ -45,7 +42,6 @@
           </div>
         </div>
       </el-col>
-      <!-- 7/30天内报警次数统计 -->
       <el-col :span="12">
         <div class="body2">
           <div class="box-header">
@@ -53,7 +49,7 @@
               报警排名
             </h3>
             <div class="chartHead">
-              <el-radio-group v-model="warn_alarm" size="mini">
+              <el-radio-group v-model="levelNo" size="mini">
                 <el-radio-button label="1">预警</el-radio-button>
                 <el-radio-button label="2">报警</el-radio-button>
               </el-radio-group>
@@ -84,23 +80,57 @@ export default {
   components: { PieEcharts, BarEcharts },
   data() {
     return {
-      warn_alarm: "1",
+      levelNo: "1",
       timeRange: "7",
       chart1: {
         legendData: ["在线", "离线"],
-        seriesData: []
+        seriesData: [
+          {
+            name: "在线",
+            value: 0
+          },
+          {
+            name: "离线",
+            value: 0
+          }
+        ]
       },
       chart2: {
         legendData: ["正常", "故障"],
-        seriesData: []
+        seriesData: [
+          {
+            name: "正常",
+            value: 0
+          },
+          {
+            name: "故障",
+            value: 0
+          }
+        ]
       },
       chart3: {
         legendData: ["断开连接", "其他"],
-        seriesData: []
+        seriesData: [
+          {
+            name: "断开连接",
+            value: 0
+          },
+          {
+            name: "其他",
+            value: 0
+          }
+        ]
       },
       chart4: {
         xAxisData: [],
-        seriesData: []
+        seriesData: [
+          {
+            name: "报警次数",
+            type: "bar",
+            barWidth: "60%",
+            data: []
+          }
+        ]
       }
     };
   },
@@ -108,7 +138,7 @@ export default {
     timeRange: function() {
       this.resetChart4();
     },
-    warn_alarm: function() {
+    levelNo: function() {
       this.resetChart4();
     }
   },
@@ -118,28 +148,22 @@ export default {
         .then(response => {
           if (response.data.status) {
             let data = response.data.data;
-            this.chart1.seriesData = [
-              { name: "在线", value: data.N + data.D },
-              { name: "离线", value: data.O + data.others }
-            ];
-            this.chart2.seriesData = [
-              { name: "正常", value: data.N },
-              { name: "故障", value: data.D }
-            ];
-            this.chart3.seriesData = [
-              { name: "断开连接", value: data.O },
-              { name: "其他", value: data.others }
-            ];
+            this.chart1.seriesData[0].value = data.N + data.D;
+            this.chart1.seriesData[1].value = data.O + data.others;
+            this.chart2.seriesData[0].value = data.N;
+            this.chart2.seriesData[1].value = data.D;
+            this.chart3.seriesData[0].value = data.O;
+            this.chart3.seriesData[1].value = data.others;
           }
         })
         .catch(() => {
           this.$message.error("设备在线离线统计失败！");
         });
-      // this.resetChart4();
+      this.resetChart4();
     },
     resetChart4() {
       let param = {
-        warnAlarm: this.warn_alarm,
+        levelNo: this.levelNo,
         timeRange: this.timeRange
       };
       alarmRank(param)
@@ -147,7 +171,7 @@ export default {
           if (response.data.status) {
             let data = response.data.data;
             this.chart4.xAxisData = data.xAxisData;
-            this.chart4.seriesData = data.seriesData;
+            this.chart4.seriesData[0].data = data.seriesData;
           }
         })
         .catch(() => {
