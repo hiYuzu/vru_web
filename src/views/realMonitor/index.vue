@@ -23,7 +23,8 @@ export default {
       monitorVOMap: [],
       oilVOList: [],
       alarmVOList: [],
-      title: ""
+      title: "",
+      timer: null
     };
   },
   components: { MapDialog },
@@ -31,6 +32,17 @@ export default {
     this.mapDialogVisible = false;
     this.baiduMap();
     this.getMapPoint();
+    /* if (this.timer) {
+      clearInterval(this.timer);
+    } else {
+      var i = 0;
+      this.timer = setInterval(() => {
+        this.getMapPoint(i);
+      }, 30000);
+    } */
+  },
+  destroyed() {
+    clearInterval(this.timer);
   },
   methods: {
     baiduMap() {
@@ -48,7 +60,8 @@ export default {
       this.map.clearOverlays();
     },
     //查询地图上的点位信息
-    getMapPoint() {
+    getMapPoint(num) {
+      console.info(num);
       let that = this;
       mapPointsQuery()
         .then(res => {
