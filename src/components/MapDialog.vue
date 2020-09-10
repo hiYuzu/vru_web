@@ -14,6 +14,30 @@
         style="width:100%;display:block;;overflow:hidden;"
       >
         <span slot="label"><i class="el-icon-date"></i> 油气处理装置</span>
+        <div class="oilFilter">
+          <el-form :inline="true" :model="mapForm" class="demo-form-inline">
+            <span for="time">时间段： </span>
+            <el-date-picker
+              v-model="mapForm.oilTime"
+              type="daterange"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd HH:mm:ss"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              :default-time="['00:00:00', '23:59:59']"
+              size="mini"
+            >
+            </el-date-picker>
+            <el-button
+              type="primary"
+              icon="el-icon-search"
+              size="mini"
+              style="margin-left:10px;"
+              @click="queryOilData"
+              >搜索
+            </el-button>
+          </el-form>
+        </div>
         <div
           style="width:100%;display:flex; flex-direction:row;overflow:hidden;"
         >
@@ -45,6 +69,7 @@
               :right="10"
               :height="400"
               :legend="legend"
+              :key="itemKey"
             ></monitor-vo-echarts>
           </div>
         </div>
@@ -53,6 +78,7 @@
         <span slot="label"><i class="el-icon-date"></i>发油信息</span>
         <el-table
           :data="tableDataOil"
+          :key="itemKey"
           border
           stripe
           height="400px"
@@ -75,18 +101,44 @@
         style="width:100%;display:block;;overflow:hidden;"
       >
         <span slot="label"><i class="el-icon-date"></i> 预警、报警</span>
+        <div class="alarmFilter">
+          <el-form :inline="true" :model="mapForm" class="demo-form-inline">
+            <span for="time">时间段： </span>
+            <el-date-picker
+              v-model="mapForm.alarmTime"
+              type="daterange"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd HH:mm:ss"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              :default-time="['00:00:00', '23:59:59']"
+              size="mini"
+            >
+            </el-date-picker>
+            <el-button
+              type="primary"
+              icon="el-icon-search"
+              size="mini"
+              style="margin-left:10px;"
+              @click="queryAlarm"
+              >搜索
+            </el-button>
+          </el-form>
+        </div>
         <div
           style="width:100%;display:flex; flex-direction:row;overflow:hidden;"
         >
           <el-table
             :data="tableDataAlarm"
+            :key="itemKey"
             border
             stripe
-            height="400px"
+            height="360px"
             style="width: 100%;flex:4;display:block;"
           >
             <el-table-column
               align="center"
+              sortable
               v-for="item in theadBodyAlarm"
               :key="item.prop"
               :width="item.width"
@@ -95,7 +147,12 @@
               :fixed="tableDataAlarm.length > 0 ? item.fixed : false"
             >
             </el-table-column>
-            <el-table-column align="center" prop="levelNo" label="报警类型">
+            <el-table-column
+              align="center"
+              prop="levelNo"
+              label="报警级别"
+              sortable
+            >
               <template slot-scope="scope">
                 <el-tag
                   :type="scope.row.levelNo === '1' ? 'warning' : 'danger'"
@@ -105,10 +162,12 @@
               </template>
             </el-table-column>
           </el-table>
+
           <div style="flex:3;display:block;">
             <alarm-per-echarts
               :chartsData="chartsData"
               :height="400"
+              :key="itemKey"
             ></alarm-per-echarts>
           </div>
         </div>
@@ -119,6 +178,7 @@
 <script>
 import MonitorVoEcharts from "./MonitorVoEcharts.vue";
 import AlarmPerEcharts from "./AlarmPerEcharts.vue";
+import { institutionDataQuery } from "@/api/user";
 export default {
   name: "MapDialog",
   data() {
@@ -171,11 +231,6 @@ export default {
       ],
       theadBodyOil: [
         {
-          prop: "dataId",
-          text: "dataId",
-          hidden: true
-        },
-        {
           prop: "dataFysj",
           text: "发油时间"
         },
@@ -210,31 +265,23 @@ export default {
       ],
       theadBodyAlarm: [
         {
-          prop: "deviceName",
-          text: "设备信息"
-        },
-        {
           prop: "alarmName",
-          text: "报警名称"
+          text: "报警类型"
         },
         {
           prop: "alarmInfo",
           text: "报警信息"
         },
         {
+          prop: "deviceName",
+          text: "设备信息"
+        },
+        {
           prop: "alarmTime",
           text: "报警时间"
         }
       ],
-      xAxisData: [
-        "2020-09-01",
-        "2020-09-02",
-        "2020-09-03",
-        "2020-09-04",
-        "2020-09-05",
-        "2020-09-06",
-        "2020-09-07"
-      ],
+      xAxisData: [],
       legend: [
         "出口NMHC浓度",
         "出口温度",
@@ -244,60 +291,18 @@ export default {
         "进口压力",
         "进口流量"
       ],
-      seriesData: [
-        {
-          name: "出口NMHC浓度",
-          type: "line",
-          areaStyle: {},
-          data: [120, 132, 101, 134, 90, 230, 210]
-        },
-        {
-          name: "出口温度",
-          type: "line",
-          areaStyle: {},
-          data: [220, 182, 191, 234, 290, 330, 310]
-        },
-        {
-          name: "出口压力",
-          type: "line",
-          areaStyle: {},
-          data: [150, 232, 201, 154, 190, 330, 410]
-        },
-        {
-          name: "出口流量",
-          type: "line",
-          areaStyle: {},
-          data: [320, 332, 301, 334, 390, 330, 320]
-        },
-        {
-          name: "进口温度",
-          type: "line",
-          label: {
-            normal: {
-              show: true,
-              position: "top"
-            }
-          },
-          areaStyle: {},
-          data: [820, 932, 901, 934, 1290, 1330, 1320]
-        },
-        {
-          name: "进口压力",
-          type: "line",
-          areaStyle: {},
-          data: [320, 332, 301, 334, 390, 330, 320]
-        },
-        {
-          name: "进口流量",
-          type: "line",
-          areaStyle: {},
-          data: [320, 332, 301, 334, 390, 330, 320]
-        }
-      ],
+      seriesData: [],
       chartsData: [
-        { value: 535, name: "预警", itemStyle: { color: "#e6a23c" } },
-        { value: 510, name: "报警", itemStyle: { color: "#f56c6c" } }
-      ]
+        { value: 0, name: "预警", itemStyle: { color: "#e6a23c" } },
+        { value: 0, name: "报警", itemStyle: { color: "#f56c6c" } }
+      ],
+      mapForm: {
+        alarmTime: ["2020-09-01 00:00:00", "2020-09-01 23:59:59"],
+        oilTime: ["2020-09-01 00:00:00", "2020-09-01 23:59:59"],
+        beginTime: "",
+        endTime: ""
+      },
+      itemKey: ""
     };
   },
   props: [
@@ -305,7 +310,10 @@ export default {
     "monitorVOMap",
     "oilVOList",
     "alarmListInfo",
-    "dialogTitle"
+    "dialogTitle",
+    "institutionId",
+    "monitorChart",
+    "alarmChart"
   ],
   components: { MonitorVoEcharts, AlarmPerEcharts },
   watch: {
@@ -316,6 +324,10 @@ export default {
         this.tableDataOil = this.oilVOList;
         this.tableDataAlarm = this.alarmListInfo;
         this.title = this.dialogTitle + "油气概况";
+        this.legend = this.monitorChart.chart_thing;
+        this.xAxisData = this.monitorChart.chart_time;
+        this.seriesData = this.getSeriesDataMonitor(this.monitorChart);
+        this.chartsData = this.getSeriersDataAlarm(this.alarmChart);
       },
       deep: true
     }
@@ -327,7 +339,93 @@ export default {
     this.title = this.dialogTitle + "油气概况";
   },
 
-  methods: {}
+  methods: {
+    //获取油气装置echarts图表的serierData
+    getSeriesDataMonitor(data) {
+      let seriesData = [];
+      for (let key in data) {
+        if (key != "chart_thing" && key != "chart_time") {
+          seriesData.push({
+            name: key,
+            type: "line",
+            areaStyle: {},
+            data: data[key]
+          });
+        }
+      }
+      return seriesData;
+    },
+    //获取报警数据的占比serierData
+    getSeriersDataAlarm(data) {
+      let seriesData = [];
+      seriesData.push({
+        value: data.chart_alarm,
+        name: "预警",
+        itemStyle: { color: "#e6a23c" }
+      });
+      seriesData.push({
+        value: data.chart_alarm,
+        name: "报警",
+        itemStyle: { color: "#f56c6c" }
+      });
+      return seriesData;
+    },
+    //查询油装置气信息
+    async queryOilData() {
+      let that = this;
+      that.tableDataVo = [];
+      if (that.mapForm.oilTime.length > 0) {
+        that.mapForm.beginTime = that.mapForm.oilTime[0];
+        that.mapForm.endTime = this.mapForm.oilTime[1];
+      }
+      var params = {
+        institutionId: that.institutionId,
+        beginTime: that.mapForm.beginTime,
+        endTime: that.mapForm.endTime
+      };
+      await institutionDataQuery(params)
+        .then(res => {
+          const { data } = res.data;
+          that.itemKey = Math.random();
+          that.tableDataVo = that.handlerMonitorVOData(data.monitorVOMap);
+          that.legend = data.monitorVOChart.chart_thing;
+          that.xAxisData = data.monitorVOChart.chart_time;
+          that.seriesData = that.getSeriesDataMonitor(data.monitorVOChart);
+        })
+        .catch(() => {});
+    },
+    //查询报警信息
+    async queryAlarm() {
+      let that = this;
+      if (that.mapForm.alarmTime.length > 0) {
+        that.mapForm.beginTime = that.mapForm.alarmTime[0];
+        that.mapForm.endTime = this.mapForm.alarmTime[1];
+      }
+      var params = {
+        institutionId: that.institutionId,
+        beginTime: that.mapForm.beginTime,
+        endTime: that.mapForm.endTime
+      };
+      await institutionDataQuery(params)
+        .then(res => {
+          const { data } = res.data;
+          that.itemKey = Math.random();
+          that.tableDataAlarm = that.handlerMonitorVOData(data.alarmVOList);
+          that.chartsData = that.getSeriersDataAlarm(data.alarmVOChart);
+        })
+        .catch(() => {});
+    },
+    //处理monitorVOMap的数据格式
+    handlerMonitorVOData(monitorVOMap) {
+      let arry = [];
+      for (let time in monitorVOMap) {
+        let infoJson = monitorVOMap[time];
+        infoJson["dataTime"] = time;
+        arry.push(infoJson);
+      }
+      return arry;
+    }
+  }
 };
 </script>
 <style scoped lang="scss">
@@ -344,7 +442,7 @@ span.unit {
   overflow: auto;
 }
 .tabContent {
-  height: 430px;
+  height: 500px;
   overflow: hidden;
 }
 .mapDialog::v-deep .el-dialog--center .el-dialog__body {
@@ -363,5 +461,14 @@ span.unit {
 }
 .mapDialog::v-deep .el-dialog__headerbtn .el-dialog__close {
   color: #fff;
+}
+.alarmFilter,
+.oilFilter {
+  width: 100%;
+  display: block;
+  padding-bottom: 10px;
+}
+.alarmFilter span {
+  color: #8492a6;
 }
 </style>

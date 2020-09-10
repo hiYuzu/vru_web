@@ -80,7 +80,6 @@ export default {
       this.$router.push("/login");
     },
     clickMenu(item) {
-      debugger;
       let title = item.id;
       this.openedTab = this.$store.state.tab.openedTab;
       this.$router.push({ path: item.url });

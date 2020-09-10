@@ -7,7 +7,10 @@
       :monitorVOMap="monitorVOMap"
       :oilVOList="oilVOList"
       :alarmListInfo="alarmVOList"
+      :monitorChart="monitorChart"
+      :alarmChart="alarmChart"
       :dialogTitle="title"
+      :institutionId="institutionId"
     ></map-dialog>
   </div>
 </template>
@@ -23,7 +26,10 @@ export default {
       monitorVOMap: [],
       oilVOList: [],
       alarmVOList: [],
+      alarmChart: null,
+      monitorChart: null,
       title: "",
+      institutionId: "",
       timer: null
     };
   },
@@ -115,14 +121,21 @@ export default {
     //获取油气处理装置信息、发油信息
     async getInstitutionData(data) {
       var that = this;
-      var params = { institutionId: data.pointId, beginTime: "", endTime: "" };
+      var params = {
+        institutionId: data.pointId,
+        beginTime: "2020-09-01 00:00:00",
+        endTime: "2020-09-01 23:59:59"
+      };
       that.title = data.pointName;
+      that.institutionId = data.pointId;
       await institutionDataQuery(params)
         .then(res => {
           const { data } = res.data;
           that.monitorVOMap = this.handlerMonitorVOData(data.monitorVOMap);
           that.oilVOList = data.oilVOList;
           that.alarmVOList = data.alarmVOList;
+          this.monitorChart = data.monitorVOChart;
+          this.alarmChart = data.alarmVOChart;
           that.showmapDialogVisible();
         })
         .catch(() => {});
