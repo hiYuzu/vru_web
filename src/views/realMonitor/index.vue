@@ -4,6 +4,7 @@
     <map-dialog
       v-show="mapDialogVisible"
       :dialogVisible="mapDialogVisible"
+      :timeRange="timeRange"
       :monitorVOMap="monitorVOMap"
       :oilVOList="oilVOList"
       :alarmListInfo="alarmVOList"
@@ -23,6 +24,7 @@ export default {
     return {
       map: null,
       mapDialogVisible: false,
+      timeRange: ["2020-09-01 00:00:00", "2020-09-01 23:59:59"], //时间范围
       monitorVOMap: [],
       oilVOList: [],
       alarmVOList: [],
@@ -123,8 +125,8 @@ export default {
       var that = this;
       var params = {
         institutionId: data.pointId,
-        beginTime: "2020-09-01 00:00:00",
-        endTime: "2020-09-01 23:59:59"
+        beginTime: that.timeRange[0],
+        endTime: that.timeRange[1]
       };
       that.title = data.pointName;
       that.institutionId = data.pointId;

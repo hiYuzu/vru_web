@@ -18,7 +18,7 @@
           <el-form :inline="true" :model="mapForm" class="demo-form-inline">
             <span for="time">时间段： </span>
             <el-date-picker
-              v-model="mapForm.alarmTime"
+              v-model="mapForm.timeRange"
               type="daterange"
               value-format="yyyy-MM-dd HH:mm:ss"
               format="yyyy-MM-dd HH:mm:ss"
@@ -104,7 +104,7 @@
           <el-form :inline="true" :model="mapForm" class="demo-form-inline">
             <span for="time">时间段： </span>
             <el-date-picker
-              v-model="mapForm.alarmTime"
+              v-model="mapForm.timeRange"
               type="daterange"
               value-format="yyyy-MM-dd HH:mm:ss"
               format="yyyy-MM-dd HH:mm:ss"
@@ -297,7 +297,7 @@ export default {
         { value: 0, name: "报警", itemStyle: { color: "#f56c6c" } }
       ],
       mapForm: {
-        alarmTime: ["2020-09-01 00:00:00", "2020-09-01 23:59:59"],
+        timeRange: this.timeRange,
         beginTime: "",
         endTime: ""
       },
@@ -306,6 +306,7 @@ export default {
   },
   props: [
     "dialogVisible",
+    "timeRange",
     "monitorVOMap",
     "oilVOList",
     "alarmListInfo",
@@ -323,6 +324,7 @@ export default {
         this.tableDataOil = this.oilVOList;
         this.tableDataAlarm = this.alarmListInfo;
         this.title = this.dialogTitle + "油气概况";
+        this.mapForm.timeRange = this.timeRange;
         if (this.monitorChart != null) {
           this.legend = this.monitorChart.chart_thing;
           this.xAxisData = this.monitorChart.chart_time;
@@ -344,11 +346,11 @@ export default {
     this.tableDataOil = this.oilVOList;
     this.tableDataAlarm = this.alarmListInfo;
     this.title = this.dialogTitle + "油气概况";
+    this.mapForm.timeRange = this.timeRange;
   },
 
   methods: {
-    handleClick(e) {
-      console.info(e.index);
+    handleClick() {
       this.query();
     },
     //获取油气装置echarts图表的serierData
@@ -385,9 +387,9 @@ export default {
     async query() {
       let that = this;
       that.tableDataVo = [];
-      if (that.mapForm.alarmTime.length > 0) {
-        that.mapForm.beginTime = that.mapForm.alarmTime[0];
-        that.mapForm.endTime = this.mapForm.alarmTime[1];
+      if (that.mapForm.timeRange.length > 0) {
+        that.mapForm.beginTime = that.mapForm.timeRange[0];
+        that.mapForm.endTime = this.mapForm.timeRange[1];
       }
       var params = {
         institutionId: that.institutionId,
