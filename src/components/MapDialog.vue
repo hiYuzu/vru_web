@@ -132,7 +132,7 @@
             :key="itemKey"
             border
             stripe
-            height="360px"
+            height="400px"
             style="width: 100%;flex:4;display:block;"
           >
             <el-table-column
@@ -468,7 +468,7 @@ span.unit {
   overflow: auto;
 }
 .tabContent {
-  height: 500px;
+  height: 520px;
   overflow: hidden;
 }
 .mapDialog::v-deep .el-dialog--center .el-dialog__body {
@@ -482,7 +482,7 @@ span.unit {
 }
 
 .mapDialog::v-deep .el-tabs__content {
-  height: 430px;
+  height: 460px;
   overflow: hidden;
 }
 .mapDialog::v-deep .el-dialog__headerbtn .el-dialog__close {
