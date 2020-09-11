@@ -31,7 +31,7 @@
           <!-- #426666 -->
           <li
             data-v-37dfd6fc=""
-            style="color:green;font-weight:bold;margin-bottom:5px;"
+            style="color:#fff;font-weight:bold;margin-bottom:5px;"
           >
             <label>用户登录</label>
           </li>
@@ -232,7 +232,7 @@ img {
   .logintop {
     height: 47px;
     position: absolute;
-    top: 12.7%;
+    top: 0%;
     /*  background: url(~@/assets/images/login/loginbg1.png) repeat-x; */
     background: #5a79ba /*  #426666 */;
     z-index: 100;
@@ -253,8 +253,8 @@ img {
     height: 685px;
     overflow: hidden;
     position: absolute;
-    top: 50%;
-    margin-top: -430px;
+    top: 15%;
+    /* margin-top: -430px; */
     z-index: 101;
     display: -webkit-box;
     display: -moz-box;
@@ -266,6 +266,7 @@ img {
     .loginbox {
       width: 850px;
       height: 500px;
+      margin-left: 380px;
       /*   background: url(~@/assets/images/login/logininfo2.png) no-repeat; */
       ul {
         margin-top: 50px;
@@ -355,7 +356,7 @@ img {
   position: absolute;
   z-index: 999999999;
   right: 1px;
-  top: 12.5%;
+  top: 0;
   margin-right: -6px;
   cursor: pointer;
   transition: all 0.3s ease;
