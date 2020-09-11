@@ -19,11 +19,12 @@
             <span for="time">时间段： </span>
             <el-date-picker
               v-model="mapForm.timeRange"
-              type="daterange"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              format="yyyy-MM-dd HH:mm:ss"
+              type="datetimerange"
+              range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd HH:mm:ss"
               :default-time="['00:00:00', '23:59:59']"
               size="mini"
             >
@@ -33,7 +34,7 @@
               icon="el-icon-search"
               size="mini"
               style="margin-left:10px;"
-              @click="query"
+              @click="query('0')"
               >搜索
             </el-button>
           </el-form>
@@ -77,6 +78,32 @@
 
       <el-tab-pane class="tabContent">
         <span slot="label"><i class="el-icon-date"></i>发油信息</span>
+        <div class="oilFilter">
+          <el-form :inline="true" :model="mapForm" class="demo-form-inline">
+            <span for="time">时间段： </span>
+            <el-date-picker
+              v-model="mapForm.timeRange"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd HH:mm:ss"
+              :default-time="['00:00:00', '23:59:59']"
+              size="mini"
+            >
+            </el-date-picker>
+            <el-button
+              id="oilVO"
+              type="primary"
+              icon="el-icon-search"
+              size="mini"
+              style="margin-left:10px;"
+              @click="query('1')"
+              >搜索
+            </el-button>
+          </el-form>
+        </div>
         <el-table
           :data="tableDataOil"
           :key="itemKey"
@@ -105,11 +132,12 @@
             <span for="time">时间段： </span>
             <el-date-picker
               v-model="mapForm.timeRange"
-              type="daterange"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              format="yyyy-MM-dd HH:mm:ss"
+              type="datetimerange"
+              range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd HH:mm:ss"
               :default-time="['00:00:00', '23:59:59']"
               size="mini"
             >
@@ -119,7 +147,7 @@
               icon="el-icon-search"
               size="mini"
               style="margin-left:10px;"
-              @click="query"
+              @click="query('2')"
               >搜索
             </el-button>
           </el-form>
@@ -197,7 +225,8 @@ export default {
         {
           prop: "dataTime",
           text: "时间",
-          width: 152
+          width: 152,
+          fixed: true
         },
         {
           prop: "出口NMHC浓度",
@@ -350,8 +379,9 @@ export default {
   },
 
   methods: {
-    handleClick() {
-      this.query();
+    handleClick(e) {
+      console.info(e);
+      this.query(e.index);
     },
     //获取油气装置echarts图表的serierData
     getSeriesDataMonitor(data) {
@@ -384,7 +414,7 @@ export default {
       return seriesData;
     },
     //查询油装置气信息
-    async query() {
+    async query(flag) {
       let that = this;
       that.tableDataVo = [];
       if (that.mapForm.timeRange.length > 0) {
@@ -400,47 +430,31 @@ export default {
         .then(res => {
           const { data } = res.data;
           that.itemKey = Math.random();
-          that.tableDataVo = that.handlerMonitorVOData(data.monitorVOMap);
-          if (data.monitorVOChart != null) {
-            that.legend = data.monitorVOChart.chart_thing;
-            that.xAxisData = data.monitorVOChart.chart_time;
-            that.seriesData = that.getSeriesDataMonitor(data.monitorVOChart);
+          if (flag == "0") {
+            that.tableDataVo = that.handlerMonitorVOData(data.monitorVOMap);
+            if (data.monitorVOChart != null) {
+              that.legend = data.monitorVOChart.chart_thing;
+              that.xAxisData = data.monitorVOChart.chart_time;
+              that.seriesData = that.getSeriesDataMonitor(data.monitorVOChart);
+            } else {
+              that.legend = [];
+              that.xAxisData = [];
+              that.seriesData = [];
+            }
+          } else if (flag == "1") {
+            that.tableDataOil = data.oilVOList;
           } else {
-            that.legend = [];
-            that.xAxisData = [];
-            that.seriesData = [];
-          }
-          if (data.alarmVOChart != null) {
-            that.tableDataAlarm = that.handlerMonitorVOData(data.alarmVOList);
-            that.chartsData = that.getSeriersDataAlarm(data.alarmVOChart);
-          } else {
-            that.tableDataAlarm = [];
-            that.chartsData = [];
+            if (data.alarmVOChart != null) {
+              that.tableDataAlarm = that.handlerMonitorVOData(data.alarmVOList);
+              that.chartsData = that.getSeriersDataAlarm(data.alarmVOChart);
+            } else {
+              that.tableDataAlarm = [];
+              that.chartsData = [];
+            }
           }
         })
         .catch(() => {});
     },
-    /*   //查询报警信息
-    async queryAlarm() {
-      let that = this;
-      if (that.mapForm.alarmTime.length > 0) {
-        that.mapForm.beginTime = that.mapForm.alarmTime[0];
-        that.mapForm.endTime = this.mapForm.alarmTime[1];
-      }
-      var params = {
-        institutionId: that.institutionId,
-        beginTime: that.mapForm.beginTime,
-        endTime: that.mapForm.endTime
-      };
-      await institutionDataQuery(params)
-        .then(res => {
-          const { data } = res.data;
-          that.itemKey = Math.random();
-          that.tableDataAlarm = that.handlerMonitorVOData(data.alarmVOList);
-          that.chartsData = that.getSeriersDataAlarm(data.alarmVOChart);
-        })
-        .catch(() => {});
-    }, */
     //处理monitorVOMap的数据格式
     handlerMonitorVOData(monitorVOMap) {
       let arry = [];

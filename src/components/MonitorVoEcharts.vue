@@ -78,7 +78,6 @@ export default {
   },
   methods: {
     renderPieChart: function() {
-      debugger;
       let myChart = this.$echarts.init(
         document.getElementById(this.id),
         "macarons"

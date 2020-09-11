@@ -17,6 +17,7 @@
 </template>
 <script>
 import { mapPointsQuery, institutionDataQuery } from "@/api/user";
+import { fomatDateToStrToYMD } from "@/utils/date.js";
 import MapDialog from "./../../components/MapDialog.vue";
 export default {
   name: "realMonitor",
@@ -38,6 +39,10 @@ export default {
   components: { MapDialog },
   mounted() {
     this.mapDialogVisible = false;
+    let dt = fomatDateToStrToYMD(new Date());
+    let t1 = dt + " 00:00:00";
+    let t2 = dt + " 23:59:59";
+    this.timeRange = [t1, t2];
     this.baiduMap();
     this.getMapPoint();
     /* if (this.timer) {
