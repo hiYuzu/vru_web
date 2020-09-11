@@ -63,7 +63,17 @@ export default {
       this.map.enableScrollWheelZoom(); ////启用滚轮放大缩小
       this.map.enableDragging();
       let point = new window.BMap.Point(117.56479, 39.096422); //设置地图位置
-      this.map.centerAndZoom(point, 16);
+      this.map.centerAndZoom(point, 15);
+      let styleJson = [
+        {
+          featureType: "poilabel",
+          elementType: "labels",
+          stylers: {
+            visibility: "off"
+          }
+        }
+      ];
+      this.map.setMapStyle({ styleJson: styleJson });
       //添加地图类型控件
       this.map.addControl(
         new window.BMap.MapTypeControl({
@@ -89,7 +99,11 @@ export default {
                 data[i].alarmCount = 0;
                 data[i].warnCount = 0;
               }
+              let point = new window.BMap.Point(data[i].mapX, data[i].mapY);
+              let arrPois = [];
+              arrPois.push(point);
               that.addMarker(data[i]);
+              //that.map.setViewport(arrPois);
             }
           }
         })
