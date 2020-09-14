@@ -89,6 +89,7 @@ export default {
       mapPointsQuery()
         .then(res => {
           if (res.status) {
+            let arrPois = [];
             const { data } = res.data;
             for (let i = 0; i < data.length; i++) {
               if (i == 0) {
@@ -100,11 +101,11 @@ export default {
                 data[i].warnCount = 0;
               }
               let point = new window.BMap.Point(data[i].mapX, data[i].mapY);
-              let arrPois = [];
+
               arrPois.push(point);
               that.addMarker(data[i]);
-              //that.map.setViewport(arrPois);
             }
+            that.map.setViewport(arrPois);
           }
         })
         .catch(() => {
