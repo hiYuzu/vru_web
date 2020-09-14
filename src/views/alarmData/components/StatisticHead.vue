@@ -65,7 +65,7 @@
 <script>
 import {
   getInstitutionHead,
-  exportExcel,
+  getAlarmShowData,
   getAuthorityDeviceHead
 } from "@/api/user";
 export default {
@@ -129,46 +129,81 @@ export default {
       this.$bus.emit("queryStatistics");
     },
     exportExcel() {
-      if (this.isEdge()) {
-        this.$message.error("抱歉！Edge浏览器无法下载文件！");
-        return false;
-      }
       let queryParams = this.$store.state.statistic.queryParam;
+      if (queryParams.time.length == 0) {
+        this.$message.error("查询条件不明确");
+        return;
+      }
       let param = {};
       param.deviceCode = queryParams.deviceCode;
       param.alarmCode = queryParams.alarmCode;
-      param.thingCode = queryParams.thingCode;
-      param.time = queryParams.time;
-      param.type = "excel_alarm";
-      let fileName = "报警统计.xls";
-      //发送请求
-      exportExcel(param).then(res => {
-        const blob = new Blob([res]);
-        if ("download" in document.createElement("a")) {
-          // 非IE下载
-          const elink = document.createElement("a");
-          elink.download = fileName;
-          elink.style.display = "none";
-          elink.href = URL.createObjectURL(blob);
-          document.body.appendChild(elink);
-          elink.click();
-          // 释放URL对象
-          URL.revokeObjectURL(elink.href);
-          document.body.removeChild(elink);
-        } else {
-          // IE10+下载
-          navigator.msSaveBlob(blob, fileName);
+      param.beginTime = queryParams.time[0];
+      param.endTime = queryParams.time[1];
+      let allTableData = [];
+      getAlarmShowData(param).then(response => {
+        if (response.data.status) {
+          allTableData = response.data.data;
+          if (allTableData.length > 0) {
+            this.exportData(allTableData);
+          } else {
+            this.$message.warning("无数据");
+          }
         }
       });
     },
-    isEdge() {
-      let flag = false;
-      // 取得浏览器的userAgent字符串
-      let userAgent = navigator.userAgent;
-      if (userAgent.indexOf("Edge") > -1) {
-        flag = true;
+    exportData(allTableData) {
+      let wb = this.$XLSX.utils.book_new();
+      let tableArr = [
+        {
+          institution: "发油库",
+          deviceName: "发油设备",
+          institutionAddress: "发油库区域",
+          alarmName: "告警名称",
+          levelName: "预警报警",
+          alarmInfo: "告警信息",
+          alarmTime: "告警时间"
+        }
+      ];
+      allTableData.forEach(item => {
+        tableArr.push({
+          institution: item.institution,
+          deviceName: item.deviceName,
+          institutionAddress: item.institutionAddress,
+          alarmName: item.alarmName,
+          levelName: item.levelName,
+          alarmInfo: item.alarmInfo,
+          alarmTime: item.alarmTime
+        });
+      });
+      var ws = this.$XLSX.utils.json_to_sheet(tableArr, {
+        header: [
+          "institution",
+          "deviceName",
+          "institutionAddress",
+          "alarmName",
+          "levelName",
+          "alarmInfo",
+          "alarmTime"
+        ],
+        skipHeader: true
+      });
+      this.$XLSX.utils.book_append_sheet(wb, ws, "sheetName");
+      var wbout = this.$XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
+      });
+      try {
+        this.$FileSaver.saveAs(
+          new Blob([wbout], {
+            type: "application/octet-stream"
+          }),
+          "告警统计.xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
       }
-      return flag;
+      return wbout;
     }
   },
   mounted() {

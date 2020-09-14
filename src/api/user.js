@@ -10,7 +10,6 @@ export const getVaildCode = () => post("/vruApi/getValidCode", null);
 export const getInstitutionHead = () => post("getInstitutionHead", null);
 export const getAuthorityDeviceHead = params =>
   post("getAuthorityDeviceHead", params);
-export const exportExcel = params => post("exportExcel", params);
 export const getAlarmShowDataCount = params =>
   post("getAlarmShowDataCount", params);
 export const getAlarmShowData = params => post("getAlarmShowData", params);

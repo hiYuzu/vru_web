@@ -54,7 +54,7 @@ export default {
           },
           {
             prop: "deviceName",
-            text: "设备"
+            text: "发油设备"
           },
           {
             prop: "institutionAddress",
@@ -62,15 +62,19 @@ export default {
           },
           {
             prop: "alarmName",
-            text: "报警名称"
+            text: "告警名称"
           },
           {
             prop: "levelName",
             text: "预警报警"
           },
           {
+            prop: "alarmInfo",
+            text: "告警信息"
+          },
+          {
             prop: "alarmTime",
-            text: "时间"
+            text: "告警时间"
           }
         ]
       }
