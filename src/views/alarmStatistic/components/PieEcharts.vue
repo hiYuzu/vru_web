@@ -82,7 +82,7 @@ export default {
             name: "",
             type: "pie",
             radius: "55%",
-            center: ["50%, 60%"],
+            center: ["50%", "60%"],
             data: this.seriesData,
             emphasis: {
               itemStyle: {

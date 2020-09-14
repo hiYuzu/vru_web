@@ -108,7 +108,7 @@ export default {
   data() {
     return {
       levelNo: "1",
-      timeRange: "30",
+      timeRange: "7",
       chart1: {
         legendData: ["在线", "离线"],
         seriesData: [
