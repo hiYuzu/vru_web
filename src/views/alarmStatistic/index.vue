@@ -5,6 +5,15 @@
         <div class="body1">
           <div class="box-header">
             <h3 class="box-title">连接状态</h3>
+            <div class="chartHead">
+              <el-button
+                type="primary"
+                icon="el-icon-refresh-right"
+                size="mini"
+                @click="query"
+                >刷新
+              </el-button>
+            </div>
           </div>
           <div class="box-body">
             <pie-echarts
@@ -18,6 +27,15 @@
         <div class="body2">
           <div class="box-header">
             <h3 class="box-title">在线站点</h3>
+            <div class="chartHead">
+              <el-button
+                type="primary"
+                icon="el-icon-refresh-right"
+                size="mini"
+                @click="query"
+                >刷新
+              </el-button>
+            </div>
           </div>
           <div class="box-body">
             <pie-echarts
@@ -33,6 +51,15 @@
         <div class="body1">
           <div class="box-header">
             <h3 class="box-title">离线站点</h3>
+            <div class="chartHead">
+              <el-button
+                type="primary"
+                icon="el-icon-refresh-right"
+                size="mini"
+                @click="query"
+                >刷新
+              </el-button>
+            </div>
           </div>
           <div class="box-body">
             <pie-echarts
@@ -81,7 +108,7 @@ export default {
   data() {
     return {
       levelNo: "1",
-      timeRange: "7",
+      timeRange: "30",
       chart1: {
         legendData: ["在线", "离线"],
         seriesData: [
@@ -190,6 +217,10 @@ export default {
   flex: 1;
   flex-wrap: wrap;
   align-content: flex-start;
+  .head {
+    padding: 0px 0px 15px;
+    align-items: center;
+  }
   .div_chart {
     width: 100%;
     margin: 0px 8px 10px 8px;

@@ -180,7 +180,7 @@ export default {
 .head {
   @extend .flexBox !optional;
   flex-wrap: wrap;
-  padding: 5px 0px;
+  padding: 0px 0px 15px;
   align-items: center;
   > span {
     margin-left: 10px;
