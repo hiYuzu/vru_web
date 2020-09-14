@@ -64,7 +64,7 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         class="marginLeft"
-        value-format="yyyy-MM-mm HH:mm:ss"
+        value-format="yyyy-MM-dd HH:mm:ss"
       >
       </el-date-picker>
       <el-button type="primary" icon="el-icon-search" size="mini" @click="query"
@@ -75,7 +75,7 @@
         icon="el-icon-receiving"
         size="mini"
         @click="exportExcel"
-        >导出到Excel
+        >导出
       </el-button>
     </div>
     <div class="pmClass">

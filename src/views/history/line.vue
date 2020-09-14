@@ -58,7 +58,7 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         class="marginLeft"
-        value-format="yyyy-MM-mm HH:mm:ss"
+        value-format="yyyy-MM-dd HH:mm:ss"
       >
       </el-date-picker>
       <el-button type="primary" icon="el-icon-search" size="mini" @click="query"
@@ -110,8 +110,8 @@ export default {
         { label: "小时数据", value: 2061 },
         { label: "每日数据", value: 2031 }
       ],
-      xAxisData: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      seriesData: [820, 932, 901, 934, 1290, 1330, 1320]
+      xAxisData: [],
+      seriesData: []
     };
   },
   methods: {
@@ -147,7 +147,12 @@ export default {
       historyQuery(param)
         .then(res => {
           const { data } = res.data;
-          console.info(data);
+          this.xAxisData = [];
+          this.seriesData = [];
+          for (let result of data) {
+            this.xAxisData.push(result.beginTime);
+            this.seriesData.push(result.thingAvg);
+          }
         })
         .catch(() => {
           this.$message.error("查询表格异常！");
