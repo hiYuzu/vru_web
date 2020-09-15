@@ -83,13 +83,7 @@ export default {
           mapTypes: [window.BMAP_NORMAL_MAP, window.BMAP_HYBRID_MAP]
         })
       );
-      let overView = new window.BMap.OverviewMapControl();
-      let overViewOpen = new window.BMap.OverviewMapControl({
-        isOpen: true,
-        anchor: window.BMAP_ANCHOR_BOTTOM_RIGHT
-      });
-      this.map.addControl(overView); //添加默认缩略地图控件
-      this.map.addControl(overViewOpen); //右下角，打开 */
+      this.map.addControl(this.geoLactionCtrl());
       this.map.clearOverlays();
     },
     //查询地图上的点位信息
@@ -123,7 +117,7 @@ export default {
           //this.$message.error("查询地图上的数据异常！");
         });
     },
-    //地图上秒点
+    //地图上描点
     addMarker(data) {
       let image = "";
       let that = this;
@@ -163,6 +157,7 @@ export default {
         false
       );
     },
+    //监测点位的窗口信息
     showInfoWindow(marker, id) {
       let html = [
         "<div class='infoBoxContent'><div class='title'><strong>报警分析</strong></div>",
@@ -275,6 +270,53 @@ export default {
         })
         .catch(() => {});
     },
+    //自定义定位控件
+    geoLactionCtrl() {
+      function getLocationControl() {
+        // 默认停靠位置和偏移量
+        this.defaultAnchor = window.BMAP_ANCHOR_BOTTOM_RIGHT;
+        this.defaultOffset = new window.BMap.Size(10, 60);
+      }
+      let that = this;
+      let image = require("../../assets/images/realMonitor/location.png");
+      getLocationControl.prototype = new window.BMap.Control();
+      getLocationControl.prototype.initialize = function(map) {
+        let divGeolaction = document.createElement("div");
+        divGeolaction.style.width = "35px";
+        divGeolaction.className = "locationBtn";
+        divGeolaction.style.height = "35px";
+        divGeolaction.style.boxShadow = "4px 4px 5px rgba(0,0,0,0.5)";
+        // 创建一个DOM元素
+        divGeolaction.style.backgroundColor = "#fefefe";
+        divGeolaction.style.border = "none";
+        divGeolaction.style.borderRadius = "4px";
+        //创建一个放大用的img
+        let img_location = document.createElement("img");
+        //设置img的src属性
+        img_location.setAttribute("src", image);
+        img_location.style.margin = "2px 3px 0px 2px";
+        //为img设置点击事件
+        img_location.onclick = function() {
+          that.getMapPoint();
+          divGeolaction.style.background = "#3385ff";
+        };
+        img_location.onclick = function() {
+          that.getMapPoint();
+          //divGeolaction.style.background = "#3385ff";
+        };
+        //添加放大的img图标到div中
+        divGeolaction.appendChild(img_location);
+
+        // 添加DOM元素到地图中
+        map.getContainer().appendChild(divGeolaction);
+
+        // 将DOM元素返回
+        return divGeolaction;
+      };
+      // 创建控件
+      let myGeoLactionCtrl = new getLocationControl();
+      return myGeoLactionCtrl;
+    },
     //处理monitorVOMap的数据格式
     handlerMonitorVOData(monitorVOMap) {
       let arry = [];
@@ -303,6 +345,26 @@ export default {
 </style>
 
 <style>
+.anchorBL {
+  display: none;
+}
+.locationBtn:hover {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+.locationBtn:active {
+  background-image: none;
+  outline: 0;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+.locationBtn:focus,
+.locationBtn:hover {
+  color: #333;
+  text-decoration: none;
+}
 .dataInfo {
   padding: 2px;
 }
