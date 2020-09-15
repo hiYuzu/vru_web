@@ -84,12 +84,14 @@ export default {
         })
       );
       this.map.addControl(this.geoLactionCtrl());
+      this.map.addControl(this.zoomInOutCtrl());
       this.map.clearOverlays();
     },
     //查询地图上的点位信息
     getMapPoint(num) {
       console.info(num);
       this.map.clearOverlays();
+      this.infoBoxJson = {};
       let that = this;
       mapPointsQuery()
         .then(res => {
@@ -270,12 +272,97 @@ export default {
         })
         .catch(() => {});
     },
+    //自定义放大缩小控件
+    zoomInOutCtrl() {
+      function ZoomControl() {
+        // 默认停靠位置和偏移量
+        this.defaultAnchor = window.BMAP_ANCHOR_BOTTOM_RIGHT;
+        this.defaultOffset = new window.BMap.Size(10, 160);
+      }
+      let that = this;
+      // 通过JavaScript的prototype属性继承于BMap.Control
+      ZoomControl.prototype = new window.BMap.Control();
+      // 自定义控件必须实现自己的initialize方法,并且将控件的DOM元素返回
+      // 在本方法中创建个div元素作为控件的容器,并将其添加到地图容器中
+      ZoomControl.prototype.initialize = function(map) {
+        // 创建一个DOM元素
+        let mydiv = document.createElement("div");
+
+        let divZoomIn = document.createElement("div");
+        // 添加文字说明
+        divZoomIn.appendChild(document.createTextNode("+"));
+        // 设置样式
+        divZoomIn.style.cursor = "pointer";
+        divZoomIn.className = "zoomlevel";
+        divZoomIn.style.boxShadow = "4px 4px 8px #BDBDBD";
+        divZoomIn.style.border = "none";
+        divZoomIn.style.borderRadius = "2px 0px 0px 0px";
+        divZoomIn.style.backgroundColor = "#fefefe";
+        divZoomIn.style.padding = " 2px 10px";
+        divZoomIn.style.fontSize = "22px";
+        divZoomIn.style.color = "#5a79ba";
+        // 绑定事件,点击一次放大两级
+        divZoomIn.onclick = function() {
+          map.setZoom(map.getZoom() + 1);
+          that.zoomLevel = that.map.getZoom();
+          if (that.zoomLevel >= mapZoomLevel) {
+            for (let key in that.infoBoxJson) {
+              that.infoBoxJson[key].show();
+            }
+          }
+        };
+        //添加放大的img图标到div中
+        mydiv.appendChild(divZoomIn);
+
+        let divZoomOut = document.createElement("div");
+        // 添加文字说明
+        divZoomOut.appendChild(document.createTextNode("—"));
+        // 设置样式
+        divZoomOut.style.cursor = "pointer";
+        divZoomOut.style.boxShadow = "4px 4px 5px #BDBDBD";
+        divZoomOut.style.border = "none";
+        divZoomOut.style.borderTop = "1px solid #f0f0f0";
+        divZoomOut.style.borderRadius = "0px 0px 2px 0px";
+        divZoomOut.style.backgroundColor = "#fefefe";
+        divZoomOut.style.padding = " 8px 10px";
+        divZoomOut.style.fontSize = "14px";
+        divZoomOut.style.fontWeight = "bold";
+        divZoomOut.style.color = "#5a79ba";
+
+        // 绑定事件,点击一次放大两级
+        divZoomOut.onclick = function() {
+          map.setZoom(map.getZoom() - 1);
+          that.zoomLevel = that.map.getZoom();
+          if (that.zoomLevel >= mapZoomLevel) {
+            for (let key in that.infoBoxJson) {
+              that.infoBoxJson[key].hide();
+            }
+          }
+        };
+        divZoomOut.addEventListener("touchstart", function() {
+          this.style.background = "#3385ff";
+        });
+        divZoomOut.addEventListener("touchend", function() {
+          this.style.background = "#fefefe";
+        });
+        //添加放大的img图标到div中
+        mydiv.appendChild(divZoomOut);
+        // 添加DOM元素到地图中
+        map.getContainer().appendChild(mydiv);
+
+        // 将DOM元素返回
+        return mydiv;
+      };
+      // 创建控件
+      let myZoomControl = new ZoomControl();
+      return myZoomControl;
+    },
     //自定义定位控件
     geoLactionCtrl() {
       function getLocationControl() {
         // 默认停靠位置和偏移量
         this.defaultAnchor = window.BMAP_ANCHOR_BOTTOM_RIGHT;
-        this.defaultOffset = new window.BMap.Size(10, 60);
+        this.defaultOffset = new window.BMap.Size(10, 110);
       }
       let that = this;
       let image = require("../../assets/images/realMonitor/location.png");
@@ -298,11 +385,7 @@ export default {
         //为img设置点击事件
         img_location.onclick = function() {
           that.getMapPoint();
-          divGeolaction.style.background = "#3385ff";
-        };
-        img_location.onclick = function() {
-          that.getMapPoint();
-          //divGeolaction.style.background = "#3385ff";
+          //divGeolaction.style.background = "rgba(0,0,0,0.4)";
         };
         //添加放大的img图标到div中
         divGeolaction.appendChild(img_location);
