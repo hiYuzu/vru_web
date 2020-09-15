@@ -3,5 +3,5 @@ module.exports = {
   whiteList: ["/login"],
   localStorageTokenKey: "Authorization",
   headersTokenKey: "Authorization",
-  mapZoomLevel: "14"
+  mapZoomLevel: "12"
 };

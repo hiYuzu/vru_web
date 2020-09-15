@@ -116,7 +116,7 @@ export default {
               arrPois.push(point);
               that.addMarker(data[i]);
             }
-            that.map.setViewport(arrPois);
+            that.map.setViewport(arrPois, { margins: [160, 20, 0, 100] });
           }
         })
         .catch(() => {
