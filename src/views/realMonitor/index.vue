@@ -127,6 +127,7 @@ export default {
       let myIcon = new window.BMap.Icon(image, new window.BMap.Size(47, 57));
       let marker = new window.BMap.Marker(point, { icon: myIcon }); // 创建标注
       this.map.addOverlay(marker);
+      this.showInfoWindow(marker, data.pointId);
       marker.addEventListener(
         "onclick",
         function() {
@@ -134,6 +135,91 @@ export default {
         },
         false
       );
+    },
+    showInfoWindow(marker, id) {
+      let html = [
+        "<div class='infoBoxContent'><div class='title'><strong>报警分析</strong></div>",
+        "<div class='list'>",
+        "<div class='dataInfo'>",
+        "<div style='margin:10px 0px;'>",
+        "<label>NMHC浓度：<span>5.107</span></label>",
+        "<label>时间：<span>2020-09-14 15:20:34</span></label>",
+        "</div>",
+        "<div style='margin:10px 0px;'>",
+        "<label>出口温度：234</label>",
+        "<label>压力：234</label>",
+        "<label>流量：234</label>",
+        "</div>",
+        "<div style='margin:10px 0px;'>",
+        "<label>进口温度：234</label>",
+        "<label>压力：234</label>",
+        "<label>流量：234</label>",
+        "</div>",
+        "</div>",
+        "<div class='chart' id='alarmlineChart" +
+          id +
+          "' style='width:310px;height:120px;'>",
+        "</div>",
+        "</div>",
+        "</div>"
+      ];
+      let image = require("../../assets/images/realMonitor/borderBg.png");
+      let infoBox = new window.BMapLib.InfoBox(this.map, html.join(""), {
+        offset: new window.BMap.Size(0, 25),
+        boxStyle: {
+          background: "url(" + image + ") no-repeat center top",
+          width: "340px",
+          height: "263px"
+        },
+        closeIconMargin: "1px 1px 0 0",
+        enableAutoPan: true,
+        align: window.INFOBOX_AT_TOP
+      });
+      infoBox.open(marker);
+
+      let myChart1 = this.$echarts.init(
+        document.getElementById("alarmlineChart" + id),
+        "macarons"
+      );
+      myChart1.setOption({
+        grid: {
+          left: "10%",
+          top: "18%",
+          right: "8%",
+          bottom: "15%"
+        },
+        legend: {
+          textStyle: {
+            color: "#4c6cb3"
+          }
+        },
+        tooltip: {},
+        dataset: {
+          source: [
+            ["product", "预警", "报警"],
+            ["气液比", 10, 3],
+            ["NMHC浓度", 5, 2],
+            ["压力", 9, 3]
+          ]
+        },
+        color: ["#ffc773", "#e01f54"], //ffb980
+        xAxis: {
+          type: "category",
+          axisLine: {
+            lineStyle: {
+              color: "#4c6cb3"
+            }
+          }
+        },
+        yAxis: {
+          axisLine: {
+            lineStyle: {
+              color: "#4c6cb3"
+            }
+          }
+        },
+        series: [{ type: "bar" }, { type: "bar" }]
+      });
     },
     //地图上的点绑定click事件
     bindMarkerClick(data) {
@@ -186,5 +272,44 @@ export default {
   padding: 0;
   margin: -10px 0px 0px;
   overflow: hidden;
+}
+</style>
+
+<style>
+.dataInfo {
+  padding: 2px;
+}
+.dataInfo label {
+  margin: 6px 5px;
+  border: 1px solid #b1eef0;
+  border-radius: 4px;
+  padding: 4px;
+  font-size: 12px;
+  background: rgba(90, 121, 186, 0.7); /*  rgba(0, 0, 0, 0.07); */
+}
+.infoBoxContent {
+  font-size: 12px;
+}
+.infoBoxContent .title {
+  text-align: center;
+  width: 100%;
+  font-size: 12px;
+  padding-top: 10px;
+  font-weight: normal;
+  color: #fff;
+  letter-spacing: 2px;
+  font-weight: normal;
+  overflow: hidden;
+}
+.infoBoxContent .list {
+  background: rgba(255, 255, 255, 0.8) /* #5a79ba */ /* #516bb1 */
+    /*  #02366c */;
+  margin: 5px 16px 0px;
+  color: #fff;
+  height: 220px;
+  padding: 5px 1px;
+}
+.infoBox img {
+  display: none;
 }
 </style>
