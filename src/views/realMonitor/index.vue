@@ -19,6 +19,7 @@
 import { mapPointsQuery, institutionDataQuery } from "@/api/user";
 import { fomatDateToStrToYMD } from "@/utils/date.js";
 import MapDialog from "./../../components/MapDialog.vue";
+import { mapZoomLevel } from "@/config";
 export default {
   name: "realMonitor",
   data() {
@@ -33,7 +34,9 @@ export default {
       monitorChart: null,
       title: "",
       institutionId: "",
-      timer: null
+      timer: null,
+      zoomLevel: 16,
+      infoBoxJson: {}
     };
   },
   components: { MapDialog },
@@ -80,11 +83,19 @@ export default {
           mapTypes: [window.BMAP_NORMAL_MAP, window.BMAP_HYBRID_MAP]
         })
       );
+      let overView = new window.BMap.OverviewMapControl();
+      let overViewOpen = new window.BMap.OverviewMapControl({
+        isOpen: true,
+        anchor: window.BMAP_ANCHOR_BOTTOM_RIGHT
+      });
+      this.map.addControl(overView); //添加默认缩略地图控件
+      this.map.addControl(overViewOpen); //右下角，打开 */
       this.map.clearOverlays();
     },
     //查询地图上的点位信息
     getMapPoint(num) {
       console.info(num);
+      this.map.clearOverlays();
       let that = this;
       mapPointsQuery()
         .then(res => {
@@ -126,8 +137,24 @@ export default {
       }
       let myIcon = new window.BMap.Icon(image, new window.BMap.Size(47, 57));
       let marker = new window.BMap.Marker(point, { icon: myIcon }); // 创建标注
-      this.map.addOverlay(marker);
-      this.showInfoWindow(marker, data.pointId);
+      that.map.addOverlay(marker);
+
+      that.map.addEventListener("zoomend", function() {
+        that.zoomLevel = that.map.getZoom();
+        let infobox = that.infoBoxJson[data.pointId];
+        if (that.zoomLevel >= mapZoomLevel) {
+          if (infobox != undefined) {
+            that.infoBoxJson[data.pointId].show();
+          } else {
+            that.showInfoWindow(marker, data.pointId);
+          }
+        } else {
+          if (infobox != undefined) {
+            that.infoBoxJson[data.pointId].hide();
+          }
+        }
+      });
+
       marker.addEventListener(
         "onclick",
         function() {
@@ -165,7 +192,7 @@ export default {
       ];
       let image = require("../../assets/images/realMonitor/borderBg.png");
       let infoBox = new window.BMapLib.InfoBox(this.map, html.join(""), {
-        offset: new window.BMap.Size(0, 25),
+        offset: new window.BMap.Size(10, 30),
         boxStyle: {
           background: "url(" + image + ") no-repeat center top",
           width: "340px",
@@ -176,7 +203,7 @@ export default {
         align: window.INFOBOX_AT_TOP
       });
       infoBox.open(marker);
-
+      this.infoBoxJson[id] = infoBox;
       let myChart1 = this.$echarts.init(
         document.getElementById("alarmlineChart" + id),
         "macarons"

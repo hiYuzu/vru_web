@@ -2,5 +2,6 @@ module.exports = {
   title: "VRU_WEB",
   whiteList: ["/login"],
   localStorageTokenKey: "Authorization",
-  headersTokenKey: "Authorization"
+  headersTokenKey: "Authorization",
+  mapZoomLevel: "14"
 };
