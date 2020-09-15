@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: "BarEcharts",
+  name: "MutiBarEcharts",
   props: {
     height: {
       type: Number,
@@ -17,14 +17,10 @@ export default {
       type: Number,
       default: 100
     },
-    isLegend: {
-      type: Boolean,
-      default: false
-    },
     xAxisData: {
       type: Array,
       default: function() {
-        return ["设备1", "设备2", "设备3", "设备4", "设备5", "设备6"];
+        return ["09/21", "09/22", "09/23", "09/24", "09/25", "09/27"];
       }
     },
     seriesData: {
@@ -32,18 +28,21 @@ export default {
       default: function() {
         return [
           {
-            name: "报警次数",
+            name: "气液比",
             type: "bar",
-            barWidth: "60%",
-            data: [10, 52, 200, 334, 390, 330]
+            data: [18, 23, 29, 10, 13, 16]
+          },
+          {
+            name: "压力",
+            type: "bar",
+            data: [19, 23, 31, 12, 14, 18]
+          },
+          {
+            name: "NMHC浓度",
+            type: "bar",
+            data: [19, 23, 31, 12, 13, 18]
           }
         ];
-      }
-    },
-    title: {
-      type: String,
-      default: function() {
-        return "";
       }
     }
   },
@@ -53,17 +52,6 @@ export default {
   computed: {
     id: function() {
       return parseInt(Math.random() * 1000000);
-    },
-    legendData: function() {
-      let legendData = [];
-      let _this = this;
-      this.seriesData.forEach(function(elem) {
-        elem.type = "bar";
-        if (_this.isLegend) {
-          legendData.push(elem.name);
-        }
-      });
-      return legendData;
     }
   },
   methods: {
@@ -73,16 +61,8 @@ export default {
         "macarons"
       );
       myChart.setOption({
-        title: {
-          text: this.title,
-          textStyle: {
-            fontSize: 16,
-            fontWeight: "500",
-            color: "#409EFF"
-          }
-        },
         legend: {
-          data: this.legendData
+          data: ["气液比", "压力", "NMHC浓度"]
         },
         grid: {
           top: "28",

@@ -1,16 +1,41 @@
 <template>
   <div class="index_body" style="overflow-y:auto;overflow-x:hidden;">
+    <div class="head">
+      <span class="">时间段: </span>
+      <el-date-picker
+        size="mini"
+        v-model="time"
+        type="daterange"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :default-time="['00:00:00', '23:59:59']"
+      >
+      </el-date-picker>
+      &nbsp;
+      <el-button
+        type="primary"
+        icon="el-icon-search"
+        size="mini"
+        @click="initQuery"
+        >搜索
+      </el-button>
+    </div>
     <div class="div_chart">
       <el-col :span="12">
         <div class="body1">
           <div class="box-header">
-            <h3 class="box-title">连接状态</h3>
+            <h3 class="box-title">警报占比</h3>
             <div class="chartHead">
+              <el-radio-group v-model="levelOfPie" size="mini">
+                <el-radio-button label="1">预警</el-radio-button>
+                <el-radio-button label="2">报警</el-radio-button>
+              </el-radio-group>
               <el-button
                 type="primary"
                 icon="el-icon-refresh-right"
                 size="mini"
-                @click="query"
+                @click="queryPercent"
                 >刷新
               </el-button>
             </div>
@@ -26,72 +51,128 @@
       <el-col :span="12">
         <div class="body2">
           <div class="box-header">
-            <h3 class="box-title">在线站点</h3>
+            <h3 class="box-title">
+              警报排名
+            </h3>
             <div class="chartHead">
+              <el-radio-group v-model="levelOfBar" size="mini">
+                <el-radio-button label="1">预警</el-radio-button>
+                <el-radio-button label="2">报警</el-radio-button>
+              </el-radio-group>
               <el-button
                 type="primary"
                 icon="el-icon-refresh-right"
                 size="mini"
-                @click="query"
+                @click="queryRank"
                 >刷新
               </el-button>
             </div>
           </div>
           <div class="box-body">
-            <pie-echarts
-              :legendData="chart2.legendData"
+            <bar-echarts
+              :xAxisData="chart2.xAxisData"
               :seriesData="chart2.seriesData"
-            ></pie-echarts>
+            ></bar-echarts>
           </div>
         </div>
       </el-col>
     </div>
     <div class="div_chart">
       <el-col :span="12">
-        <div class="body1">
+        <div class="body2">
           <div class="box-header">
-            <h3 class="box-title">离线站点</h3>
+            <h3 class="box-title">预警统计</h3>
             <div class="chartHead">
+              <span class="">发油库: </span>
+              <el-select
+                v-model="institutionIdOfWarn"
+                placeholder="请选择"
+                size="mini"
+                @change="getWarnDeviceHead"
+              >
+                <el-option
+                  v-for="item in institutionData"
+                  :key="item.label"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <span>设备: </span>
+              <el-select
+                v-model="deviceCodeOfWarn"
+                placeholder="请选择"
+                size="mini"
+              >
+                <el-option
+                  v-for="item in deviceDataOfWarn"
+                  :key="item.label"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
               <el-button
                 type="primary"
                 icon="el-icon-refresh-right"
                 size="mini"
-                @click="query"
+                @click="getWarnStat"
                 >刷新
               </el-button>
             </div>
           </div>
           <div class="box-body">
-            <pie-echarts
-              :legendData="chart3.legendData"
+            <muti-bar-echarts
+              :xAxisData="chart3.xAxisData"
               :seriesData="chart3.seriesData"
-            ></pie-echarts>
+            ></muti-bar-echarts>
           </div>
         </div>
       </el-col>
       <el-col :span="12">
-        <div class="body2">
+        <div class="body1">
           <div class="box-header">
-            <h3 class="box-title">
-              报警排名
-            </h3>
+            <h3 class="box-title">报警统计</h3>
             <div class="chartHead">
-              <el-radio-group v-model="levelNo" size="mini">
-                <el-radio-button label="1">预警</el-radio-button>
-                <el-radio-button label="2">报警</el-radio-button>
-              </el-radio-group>
-              <el-radio-group v-model="timeRange" size="mini">
-                <el-radio-button label="7">7天</el-radio-button>
-                <el-radio-button label="30">30天</el-radio-button>
-              </el-radio-group>
+              <span class="">发油库: </span>
+              <el-select
+                v-model="institutionIdOfAlarm"
+                placeholder="请选择"
+                size="mini"
+                @change="getAlarmDeviceHead"
+              >
+                <el-option
+                  v-for="item in institutionData"
+                  :key="item.label"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <span>设备: </span>
+              <el-select
+                v-model="deviceCodeOfAlarm"
+                placeholder="请选择"
+                size="mini"
+              >
+                <el-option
+                  v-for="item in deviceDataOfAlarm"
+                  :key="item.label"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <el-button
+                type="primary"
+                icon="el-icon-refresh-right"
+                size="mini"
+                @click="getAlarmStat"
+                >刷新
+              </el-button>
             </div>
           </div>
           <div class="box-body">
-            <bar-echarts
-              :showMax="true"
+            <muti-bar-echarts
               :xAxisData="chart4.xAxisData"
               :seriesData="chart4.seriesData"
-            ></bar-echarts>
+            ></muti-bar-echarts>
           </div>
         </div>
       </el-col>
@@ -101,113 +182,185 @@
 <script>
 import PieEcharts from "./components/PieEcharts.vue";
 import BarEcharts from "./components/BarEcharts.vue";
-import { onOffLineStatistic, alarmRank } from "@/api/user";
+import MutiBarEcharts from "./components/MutiBarEcharts";
+import {
+  getInstitutionHead,
+  getAuthorityDeviceHead,
+  getAlarmPercent,
+  getAlarmRank,
+  getAlarmStatistic
+} from "@/api/user";
 export default {
   name: "AlarmStatistic",
-  components: { PieEcharts, BarEcharts },
+  components: { PieEcharts, BarEcharts, MutiBarEcharts },
   data() {
     return {
-      levelNo: "1",
-      timeRange: "7",
+      time: ["2020-06-01 00:00:00", "2020-06-10 23:59:59"],
+      levelOfPie: "1",
+      levelOfBar: "1",
+      institutionData: [],
+      institutionIdOfWarn: "",
+      institutionIdOfAlarm: "",
+      deviceCodeOfWarn: "",
+      deviceCodeOfAlarm: "",
+      deviceDataOfWarn: [],
+      deviceDataOfAlarm: [],
       chart1: {
-        legendData: ["在线", "离线"],
+        legendData: ["气液比", "压力", "NMHC浓度"],
         seriesData: [
           {
-            name: "在线",
+            name: "气液比",
             value: 0
           },
           {
-            name: "离线",
+            name: "压力",
+            value: 0
+          },
+          {
+            name: "NMHC浓度",
             value: 0
           }
         ]
       },
       chart2: {
-        legendData: ["正常", "故障"],
-        seriesData: [
-          {
-            name: "正常",
-            value: 0
-          },
-          {
-            name: "故障",
-            value: 0
-          }
-        ]
-      },
-      chart3: {
-        legendData: ["断开连接", "其他"],
-        seriesData: [
-          {
-            name: "断开连接",
-            value: 0
-          },
-          {
-            name: "其他",
-            value: 0
-          }
-        ]
-      },
-      chart4: {
         xAxisData: [],
         seriesData: [
           {
-            name: "报警次数",
+            name: "警报次数",
             type: "bar",
             barWidth: "60%",
             data: []
           }
         ]
+      },
+      chart3: {
+        xAxisData: [],
+        seriesData: []
+      },
+      chart4: {
+        xAxisData: [],
+        seriesData: []
       }
     };
   },
-  watch: {
-    timeRange: function() {
-      this.resetChart4();
-    },
-    levelNo: function() {
-      this.resetChart4();
-    }
-  },
   methods: {
-    query() {
-      onOffLineStatistic()
+    initQuery() {
+      getInstitutionHead()
         .then(response => {
           if (response.data.status) {
-            let data = response.data.data;
-            this.chart1.seriesData[0].value = data.N + data.D;
-            this.chart1.seriesData[1].value = data.O + data.others;
-            this.chart2.seriesData[0].value = data.N;
-            this.chart2.seriesData[1].value = data.D;
-            this.chart3.seriesData[0].value = data.O;
-            this.chart3.seriesData[1].value = data.others;
+            this.institutionData = response.data.data;
+          } else {
+            this.$message.error("初始化查询失败！");
           }
         })
         .catch(() => {
-          this.$message.error("设备在线离线统计失败！");
+          this.$message.error("数据查询异常！");
         });
-      this.resetChart4();
+      this.queryPercent();
+      this.queryRank();
     },
-    resetChart4() {
+    queryPercent() {
       let param = {
-        levelNo: this.levelNo,
-        timeRange: this.timeRange
+        levelNo: this.levelOfPie,
+        beginTime: this.time[0],
+        endTime: this.time[1]
       };
-      alarmRank(param)
+      getAlarmPercent(param)
+        .then(response => {
+          if (response.data.status) {
+            let data = response.data.data;
+            this.chart1.seriesData[0].value = data.GLR;
+            this.chart1.seriesData[1].value = data.PRE;
+            this.chart1.seriesData[2].value = data.NMHC;
+          }
+        })
+        .catch(() => {
+          this.$message.error("查询警报类型占比失败");
+        });
+    },
+    queryRank() {
+      let param = {
+        levelNo: this.levelOfBar,
+        beginTime: this.time[0],
+        endTime: this.time[1]
+      };
+      getAlarmRank(param)
+        .then(response => {
+          if (response.data.status) {
+            let data = response.data.data;
+            this.chart2.xAxisData = data.xAxisData;
+            this.chart2.seriesData[0].data = data.seriesData;
+          }
+        })
+        .catch(() => {
+          this.$message.error("查询警报排名失败");
+        });
+    },
+    getWarnDeviceHead() {
+      let param = { institutionId: this.institutionIdOfWarn };
+      getAuthorityDeviceHead(param)
+        .then(response => {
+          if (response.data.status) {
+            this.deviceDataOfWarn = response.data.data;
+          }
+        })
+        .catch(() => {
+          this.$message.error("设备查询异常！");
+        });
+    },
+    getAlarmDeviceHead() {
+      let param = { institutionId: this.institutionIdOfAlarm };
+      getAuthorityDeviceHead(param)
+        .then(response => {
+          if (response.data.status) {
+            this.deviceDataOfAlarm = response.data.data;
+          }
+        })
+        .catch(() => {
+          this.$message.error("设备查询异常！");
+        });
+    },
+    getWarnStat() {
+      let param = {
+        levelNo: "1",
+        deviceCode: this.deviceCodeOfWarn,
+        beginTime: this.time[0],
+        endTime: this.time[1]
+      };
+      getAlarmStatistic(param)
+        .then(response => {
+          if (response.data.status) {
+            let data = response.data.data;
+            this.chart3.xAxisData = data.xAxisData;
+            this.chart3.seriesData = data.seriesData;
+          }
+        })
+        .catch(() => {
+          this.$message.error("查询预警统计失败");
+        });
+    },
+    getAlarmStat() {
+      let param = {
+        levelNo: "2",
+        deviceCode: this.deviceCodeOfAlarm,
+        beginTime: this.time[0],
+        endTime: this.time[1]
+      };
+      getAlarmStatistic(param)
         .then(response => {
           if (response.data.status) {
             let data = response.data.data;
             this.chart4.xAxisData = data.xAxisData;
-            this.chart4.seriesData[0].data = data.seriesData;
+            this.chart4.seriesData = data.seriesData;
           }
         })
         .catch(() => {
-          this.$message.error("报警排名统计失败！");
+          this.$message.error("查询报警统计失败");
         });
     }
   },
   mounted() {
-    this.query();
+    this.initQuery();
   }
 };
 </script>
@@ -220,6 +373,11 @@ export default {
   .head {
     padding: 0px 0px 15px;
     align-items: center;
+    > span {
+      margin-left: 10px;
+      color: #8492a6;
+      font-size: 13px;
+    }
   }
   .div_chart {
     width: 100%;

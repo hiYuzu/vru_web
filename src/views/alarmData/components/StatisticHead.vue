@@ -76,7 +76,7 @@ export default {
       queryParam: {
         deviceCode: "",
         alarmCode: "",
-        time: ["2020-06-01 15:33:26", "2020-06-30 13:28:45"]
+        time: ["2020-06-01 15:33:26", "2020-06-15 13:28:45"]
       },
       institutionData: [],
       deviceData: [],
