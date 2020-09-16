@@ -99,14 +99,14 @@ export default {
             let arrPois = [];
             const { data } = res.data;
             for (let i = 0; i < data.length; i++) {
-              if (i == 0) {
+              /*   if (i == 0) {
                 data[i].alarmCount = 0;
                 data[i].warnCount = 3;
               }
               if (i == 2) {
                 data[i].alarmCount = 0;
                 data[i].warnCount = 0;
-              }
+              } */
               let point = new window.BMap.Point(data[i].mapX, data[i].mapY);
 
               arrPois.push(point);
@@ -262,7 +262,31 @@ export default {
             }
           }
         },
-        series: [{ type: "bar" }, { type: "bar" }]
+        series: [
+          {
+            type: "bar",
+            label: {
+              show: true,
+              position: "top"
+            },
+            barGap: 0.1,
+            showBackground: true,
+            backgroundStyle: {
+              color: "rgba(220, 220, 220, 0.8)"
+            }
+          },
+          {
+            type: "bar",
+            label: {
+              show: true,
+              position: "top"
+            },
+            showBackground: true,
+            backgroundStyle: {
+              color: "rgba(220, 220, 220, 0.8)"
+            }
+          }
+        ]
       });
     },
     //地图上的点绑定click事件
