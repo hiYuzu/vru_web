@@ -179,7 +179,7 @@ export default {
         "<div class='list'>",
         "<div class='dataInfo'>",
         "<div style='margin:10px 0px;'>",
-        "<label>NMHC浓度：<span>" + CKND + "</span></label>",
+        "<label>出口浓度：<span>" + CKND + "</span></label>",
         "<label>时间：<span>" + time + "</span></label>",
         "</div>",
         "<div style='margin:10px 0px;'>",
@@ -266,7 +266,7 @@ export default {
             type: "bar",
             label: {
               show: true,
-              position: "bottom"
+              position: "insideBottom"
             },
             barGap: 0.1,
             showBackground: true,
@@ -278,7 +278,7 @@ export default {
             type: "bar",
             label: {
               show: true,
-              position: "bottom"
+              position: "insideBottom"
             },
             showBackground: true,
             backgroundStyle: {
