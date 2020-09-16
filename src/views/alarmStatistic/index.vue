@@ -31,13 +31,6 @@
                 <el-radio-button label="1">预警</el-radio-button>
                 <el-radio-button label="2">报警</el-radio-button>
               </el-radio-group>
-              <el-button
-                type="primary"
-                icon="el-icon-refresh-right"
-                size="mini"
-                @click="queryPercent"
-                >刷新
-              </el-button>
             </div>
           </div>
           <div class="box-body">
@@ -59,13 +52,6 @@
                 <el-radio-button label="1">预警</el-radio-button>
                 <el-radio-button label="2">报警</el-radio-button>
               </el-radio-group>
-              <el-button
-                type="primary"
-                icon="el-icon-refresh-right"
-                size="mini"
-                @click="queryRank"
-                >刷新
-              </el-button>
             </div>
           </div>
           <div class="box-body">
@@ -97,6 +83,7 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+              &nbsp;
               <span>设备: </span>
               <el-select
                 v-model="deviceCodeOfWarn"
@@ -110,6 +97,7 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+              &nbsp;
               <el-button
                 type="primary"
                 icon="el-icon-refresh-right"
@@ -146,6 +134,7 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+              &nbsp;
               <span>设备: </span>
               <el-select
                 v-model="deviceCodeOfAlarm"
@@ -159,6 +148,7 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+              &nbsp;
               <el-button
                 type="primary"
                 icon="el-icon-refresh-right"
@@ -206,7 +196,7 @@ export default {
       deviceDataOfWarn: [],
       deviceDataOfAlarm: [],
       chart1: {
-        legendData: ["气液比", "压力", "NMHC浓度"],
+        legendData: ["气液比", "压力", "NMHC浓度", "断开连接"],
         seriesData: [
           {
             name: "气液比",
@@ -218,6 +208,10 @@ export default {
           },
           {
             name: "NMHC浓度",
+            value: 0
+          },
+          {
+            name: "断开连接",
             value: 0
           }
         ]
@@ -272,6 +266,7 @@ export default {
             this.chart1.seriesData[0].value = data.GLR;
             this.chart1.seriesData[1].value = data.PRE;
             this.chart1.seriesData[2].value = data.NMHC;
+            this.chart1.seriesData[3].value = data.O;
           }
         })
         .catch(() => {
@@ -321,6 +316,10 @@ export default {
         });
     },
     getWarnStat() {
+      if (this.deviceCodeOfWarn == "") {
+        this.$message.error("请选择设备！");
+        return;
+      }
       let param = {
         levelNo: "1",
         deviceCode: this.deviceCodeOfWarn,
@@ -340,6 +339,10 @@ export default {
         });
     },
     getAlarmStat() {
+      if (this.deviceCodeOfAlarm == "") {
+        this.$message.error("请选择设备！");
+        return;
+      }
       let param = {
         levelNo: "2",
         deviceCode: this.deviceCodeOfAlarm,
@@ -359,6 +362,18 @@ export default {
         });
     }
   },
+  watch: {
+    levelOfPie: {
+      handler() {
+        this.queryPercent();
+      }
+    },
+    levelOfBar: {
+      handler() {
+        this.queryRank();
+      }
+    }
+  },
   mounted() {
     this.initQuery();
   }
@@ -374,7 +389,7 @@ export default {
     padding: 0px 0px 15px;
     align-items: center;
     > span {
-      margin-left: 10px;
+      margin-left: 15px;
       color: #8492a6;
       font-size: 13px;
     }
