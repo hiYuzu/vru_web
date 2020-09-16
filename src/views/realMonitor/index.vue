@@ -142,7 +142,7 @@ export default {
           if (infobox != undefined) {
             that.infoBoxJson[data.pointId].show();
           } else {
-            that.showInfoWindow(marker, data.pointId);
+            that.showInfoWindow(marker, data);
           }
         } else {
           if (infobox != undefined) {
@@ -160,24 +160,38 @@ export default {
       );
     },
     //监测点位的窗口信息
-    showInfoWindow(marker, id) {
+    showInfoWindow(marker, data) {
+      let id = data.pointId;
+      let infoDatas = data.monitorVOMap;
+      let time = "";
+      for (let key in infoDatas) {
+        time = key;
+      }
+      let json = infoDatas[time];
+      let CKWD = json["出口温度"];
+      let CKND = json["出口NMHC浓度"];
+      let CKYL = json["出口压力"];
+      let CKLL = json["出口流量"];
+      let JKWD = json["进口温度"];
+      let JKYL = json["进口压力"];
+      let JKLL = json["进口流量"];
       let html = [
         "<div class='infoBoxContent'><div class='title'><strong>报警分析</strong></div>",
         "<div class='list'>",
         "<div class='dataInfo'>",
         "<div style='margin:10px 0px;'>",
-        "<label>NMHC浓度：<span>5.107</span></label>",
-        "<label>时间：<span>2020-09-14 15:20:34</span></label>",
+        "<label>NMHC浓度：<span>" + CKND + "</span></label>",
+        "<label>时间：<span>" + time + "</span></label>",
         "</div>",
         "<div style='margin:10px 0px;'>",
-        "<label>出口温度：234</label>",
-        "<label>压力：234</label>",
-        "<label>流量：234</label>",
+        "<label>出口温度：" + CKWD + "</label>",
+        "<label>压力：" + CKYL + "</label>",
+        "<label>流量：" + CKLL + "</label>",
         "</div>",
         "<div style='margin:10px 0px;'>",
-        "<label>进口温度：234</label>",
-        "<label>压力：234</label>",
-        "<label>流量：234</label>",
+        "<label>进口温度：" + JKWD + "</label>",
+        "<label>压力：" + JKYL + "</label>",
+        "<label>流量：" + JKLL + "</label>",
         "</div>",
         "</div>",
         "<div class='chart' id='alarmlineChart" +
@@ -201,6 +215,17 @@ export default {
       });
       infoBox.open(marker);
       this.infoBoxJson[id] = infoBox;
+      let chartDatas = data.alarmCountVOList;
+      let dataArry = [];
+      dataArry.push(["product", "预警", "报警"]);
+      for (let i = 0; i < chartDatas.length; i++) {
+        dataArry.push([
+          chartDatas[i].alarmName,
+          chartDatas[i].warnCount,
+          chartDatas[i].alarmCount
+        ]);
+      }
+
       let myChart1 = this.$echarts.init(
         document.getElementById("alarmlineChart" + id),
         "macarons"
@@ -219,12 +244,7 @@ export default {
         },
         tooltip: {},
         dataset: {
-          source: [
-            ["product", "预警", "报警"],
-            ["气液比", 10, 3],
-            ["NMHC浓度", 5, 2],
-            ["压力", 9, 3]
-          ]
+          source: dataArry
         },
         color: ["#ffc773", "#e01f54"], //ffb980
         xAxis: {
@@ -381,7 +401,7 @@ export default {
         let img_location = document.createElement("img");
         //设置img的src属性
         img_location.setAttribute("src", image);
-        img_location.style.margin = "2px 3px 0px 2px";
+        img_location.style.margin = "4px 3px 0px 4px";
         //为img设置点击事件
         img_location.onclick = function() {
           that.getMapPoint();
