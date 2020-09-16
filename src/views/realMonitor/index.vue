@@ -158,136 +158,6 @@ export default {
         false
       );
     },
-    //监测点位的窗口信息
-    showInfoWindow(marker, data) {
-      let id = data.pointId;
-      let infoDatas = data.monitorVOMap;
-      let time = "";
-      for (let key in infoDatas) {
-        time = key;
-      }
-      let json = infoDatas[time];
-      let CKWD = json["出口温度"] == undefined ? "-" : json["出口温度"];
-      let CKND = json["出口浓度"] == undefined ? "-" : json["出口浓度"];
-      let CKYL = json["出口压力"] == undefined ? "-" : json["出口压力"];
-      let CKLL = json["出口流量"] == undefined ? "-" : json["出口流量"];
-      let JKWD = json["进口温度"] == undefined ? "-" : json["进口温度"];
-      let JKYL = json["进口压力"] == undefined ? "-" : json["进口压力"];
-      let JKLL = json["进口流量"] == undefined ? "-" : json["进口流量"];
-      let html = [
-        "<div class='infoBoxContent'><div class='title'><strong>报警分析</strong></div>",
-        "<div class='list'>",
-        "<div class='dataInfo'>",
-        "<div style='margin:10px 0px;'>",
-        "<label>出口浓度：<span>" + CKND + "</span></label>",
-        "<label>时间：<span>" + time + "</span></label>",
-        "</div>",
-        "<div style='margin:10px 0px;'>",
-        "<label>出口温度：" + CKWD + "</label>",
-        "<label>压力：" + CKYL + "</label>",
-        "<label>流量：" + CKLL + "</label>",
-        "</div>",
-        "<div style='margin:10px 0px;'>",
-        "<label>进口温度：" + JKWD + "</label>",
-        "<label>压力：" + JKYL + "</label>",
-        "<label>流量：" + JKLL + "</label>",
-        "</div>",
-        "</div>",
-        "<div class='chart' id='alarmlineChart" +
-          id +
-          "' style='width:310px;height:120px;'>",
-        "</div>",
-        "</div>",
-        "</div>"
-      ];
-      let image = require("../../assets/images/realMonitor/borderBg.png");
-      let infoBox = new window.BMapLib.InfoBox(this.map, html.join(""), {
-        offset: new window.BMap.Size(10, 30),
-        boxStyle: {
-          background: "url(" + image + ") no-repeat center top",
-          width: "340px",
-          height: "263px"
-        },
-        closeIconMargin: "1px 1px 0 0",
-        enableAutoPan: true,
-        align: window.INFOBOX_AT_TOP
-      });
-      infoBox.open(marker);
-      this.infoBoxJson[id] = infoBox;
-      let chartDatas = data.alarmCountVOList;
-      let dataArry = [];
-      dataArry.push(["product", "预警", "报警"]);
-      for (let i = 0; i < chartDatas.length; i++) {
-        dataArry.push([
-          chartDatas[i].alarmName,
-          chartDatas[i].warnCount,
-          chartDatas[i].alarmCount
-        ]);
-      }
-
-      let myChart1 = this.$echarts.init(
-        document.getElementById("alarmlineChart" + id),
-        "macarons"
-      );
-      myChart1.setOption({
-        grid: {
-          left: "10%",
-          top: "18%",
-          right: "8%",
-          bottom: "15%"
-        },
-        legend: {
-          textStyle: {
-            color: "#4c6cb3"
-          }
-        },
-        tooltip: {},
-        dataset: {
-          source: dataArry
-        },
-        color: ["#ffc773", "#e01f54"], //ffb980
-        xAxis: {
-          type: "category",
-          axisLine: {
-            lineStyle: {
-              color: "#4c6cb3"
-            }
-          }
-        },
-        yAxis: {
-          axisLine: {
-            lineStyle: {
-              color: "#4c6cb3"
-            }
-          }
-        },
-        series: [
-          {
-            type: "bar",
-            label: {
-              show: true,
-              position: "insideBottom"
-            },
-            barGap: 0.1,
-            showBackground: true,
-            backgroundStyle: {
-              color: "rgba(220, 220, 220, 0.8)"
-            }
-          },
-          {
-            type: "bar",
-            label: {
-              show: true,
-              position: "insideBottom"
-            },
-            showBackground: true,
-            backgroundStyle: {
-              color: "rgba(220, 220, 220, 0.8)"
-            }
-          }
-        ]
-      });
-    },
     //地图上的点绑定click事件
     bindMarkerClick(data) {
       this.mapDialogVisible = false;
@@ -298,7 +168,7 @@ export default {
       let that = this;
       let t1 = getDay(-1);
       let t2 = getDay(0);
-      this.timeRange = [t1, t2];
+      that.timeRange = [t1, t2];
       let params = {
         institutionId: data.pointId,
         beginTime: that.timeRange[0],
@@ -306,14 +176,20 @@ export default {
       };
       that.title = data.pointName;
       that.institutionId = data.pointId;
+
       await institutionDataQuery(params)
         .then(res => {
+          that.monitorVOMap = [];
+          that.oilVOList = [];
+          that.alarmVOList = [];
+          that.alarmChart = null;
+          that.monitorChart = null;
           const { data } = res.data;
-          that.monitorVOMap = this.handlerMonitorVOData(data.monitorVOMap);
+          that.monitorVOMap = that.handlerMonitorVOData(data.monitorVOMap);
           that.oilVOList = data.oilVOList;
           that.alarmVOList = data.alarmVOList;
-          this.monitorChart = data.monitorVOChart;
-          this.alarmChart = data.alarmVOChart;
+          that.monitorChart = data.monitorVOChart;
+          that.alarmChart = data.alarmVOChart;
           that.showmapDialogVisible();
         })
         .catch(() => {});
@@ -445,6 +321,141 @@ export default {
       // 创建控件
       let myGeoLactionCtrl = new getLocationControl();
       return myGeoLactionCtrl;
+    },
+    //监测点位的窗口信息
+    showInfoWindow(marker, data) {
+      let id = data.pointId;
+      let infoDatas = data.monitorVOMap;
+      let time = "";
+      for (let key in infoDatas) {
+        time = key;
+      }
+      let json = infoDatas[time];
+      let CKWD = json["出口温度"] == undefined ? "-" : json["出口温度"];
+      let CKND = json["出口浓度"] == undefined ? "-" : json["出口浓度"];
+      let CKYL = json["出口压力"] == undefined ? "-" : json["出口压力"];
+      let CKLL = json["出口流量"] == undefined ? "-" : json["出口流量"];
+      let JKWD = json["进口温度"] == undefined ? "-" : json["进口温度"];
+      let JKYL = json["进口压力"] == undefined ? "-" : json["进口压力"];
+      let JKLL = json["进口流量"] == undefined ? "-" : json["进口流量"];
+      let html = [
+        "<div class='infoBoxContent'><div class='title'><strong>" +
+          data.pointName +
+          "报警分析</strong></div>",
+        "<div class='list'>",
+        "<div class='dataInfo'>",
+        "<div style='margin:10px 0px;'>",
+        "<label>出口浓度：<span>" + CKND + "</span></label>",
+        "<label>时间：<span>" + time + "</span></label>",
+        "</div>",
+        "<div style='margin:10px 0px;'>",
+        "<label>出口温度：" + CKWD + "</label>",
+        "<label>压力：" + CKYL + "</label>",
+        "<label>流量：" + CKLL + "</label>",
+        "</div>",
+        "<div style='margin:10px 0px;'>",
+        "<label>进口温度：" + JKWD + "</label>",
+        "<label>压力：" + JKYL + "</label>",
+        "<label>流量：" + JKLL + "</label>",
+        "</div>",
+        "</div>",
+        "<div class='chart' id='alarmlineChart" +
+          id +
+          "' style='width:310px;height:120px;'>",
+        "</div>",
+        "</div>",
+        "</div>"
+      ];
+      let image = require("../../assets/images/realMonitor/borderBg.png");
+      let infoBox = new window.BMapLib.InfoBox(this.map, html.join(""), {
+        offset: new window.BMap.Size(10, 30),
+        boxStyle: {
+          background: "url(" + image + ") no-repeat center top",
+          width: "340px",
+          height: "263px"
+        },
+        closeIconMargin: "1px 1px 0 0",
+        enableAutoPan: true,
+        align: window.INFOBOX_AT_TOP
+      });
+      infoBox.open(marker);
+      this.infoBoxJson[id] = infoBox;
+      let chartDatas = data.alarmCountVOList;
+      let dataArry = [];
+      dataArry.push(["product", "预警", "报警"]);
+      for (let i = 0; i < chartDatas.length; i++) {
+        dataArry.push([
+          chartDatas[i].alarmName,
+          chartDatas[i].warnCount,
+          chartDatas[i].alarmCount
+        ]);
+      }
+      this.initInboxChart(id, dataArry);
+    },
+    //初始化Inbox上的图表
+    initInboxChart(id, dataArry) {
+      let myChart1 = this.$echarts.init(
+        document.getElementById("alarmlineChart" + id),
+        "macarons"
+      );
+      myChart1.setOption({
+        grid: {
+          left: "10%",
+          top: "18%",
+          right: "8%",
+          bottom: "15%"
+        },
+        legend: {
+          textStyle: {
+            color: "#4c6cb3"
+          }
+        },
+        tooltip: {},
+        dataset: {
+          source: dataArry
+        },
+        color: ["#ffc773", "#e01f54"], //ffb980
+        xAxis: {
+          type: "category",
+          axisLine: {
+            lineStyle: {
+              color: "#4c6cb3"
+            }
+          }
+        },
+        yAxis: {
+          axisLine: {
+            lineStyle: {
+              color: "#4c6cb3"
+            }
+          }
+        },
+        series: [
+          {
+            type: "bar",
+            label: {
+              show: true,
+              position: "insideBottom"
+            },
+            barGap: 0.1,
+            showBackground: true,
+            backgroundStyle: {
+              color: "rgba(220, 220, 220, 0.8)"
+            }
+          },
+          {
+            type: "bar",
+            label: {
+              show: true,
+              position: "insideBottom"
+            },
+            showBackground: true,
+            backgroundStyle: {
+              color: "rgba(220, 220, 220, 0.8)"
+            }
+          }
+        ]
+      });
     },
     //处理monitorVOMap的数据格式
     handlerMonitorVOData(monitorVOMap) {

@@ -194,6 +194,7 @@
             <alarm-per-echarts
               autoresize
               :chartsData="chartsData"
+              :title="dialogTitle"
               :height="400"
               :key="itemKey"
             ></alarm-per-echarts>
@@ -322,8 +323,8 @@ export default {
       ],
       seriesData: [],
       chartsData: [
-        { value: 0, name: "预警", itemStyle: { color: "#e6a23c" } },
-        { value: 0, name: "报警", itemStyle: { color: "#f56c6c" } }
+        /*   { value: 0, name: "预警", itemStyle: { color: "#e6a23c" } },
+        { value: 0, name: "报警", itemStyle: { color: "#f56c6c" } } */
       ],
       mapForm: {
         timeRange: this.timeRange,
@@ -363,7 +364,7 @@ export default {
           this.xAxisData = [];
           this.seriesData = [];
         }
-        if (this.chartsData != null) {
+        if (this.alarmChart != null) {
           this.chartsData = this.getSeriersDataAlarm(this.alarmChart);
         }
       },
@@ -376,6 +377,18 @@ export default {
     this.tableDataAlarm = this.alarmListInfo;
     this.title = this.dialogTitle + "油气概况";
     this.mapForm.timeRange = this.timeRange;
+    if (this.monitorChart != null) {
+      this.legend = this.monitorChart.chart_thing;
+      this.xAxisData = this.monitorChart.chart_time;
+      this.seriesData = this.getSeriesDataMonitor(this.monitorChart);
+    } else {
+      this.legend = [];
+      this.xAxisData = [];
+      this.seriesData = [];
+    }
+    if (this.alarmChart != null) {
+      this.chartsData = this.getSeriersDataAlarm(this.alarmChart);
+    }
   },
 
   methods: {
@@ -402,7 +415,7 @@ export default {
     getSeriersDataAlarm(data) {
       let seriesData = [];
       seriesData.push({
-        value: data.chart_alarm,
+        value: data.chart_warn,
         name: "预警",
         itemStyle: { color: "#e6a23c" }
       });
