@@ -312,7 +312,7 @@ export default {
       ],
       xAxisData: [],
       legend: [
-        "出口NMHC浓度",
+        "出口浓度",
         "出口温度",
         "出口压力",
         "出口流量",

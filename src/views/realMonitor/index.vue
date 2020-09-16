@@ -17,7 +17,7 @@
 </template>
 <script>
 import { mapPointsQuery, institutionDataQuery } from "@/api/user";
-import { fomatDateToStrToYMD } from "@/utils/date.js";
+import { getDay } from "@/utils/date.js";
 import MapDialog from "./../../components/MapDialog.vue";
 import { mapZoomLevel } from "@/config";
 export default {
@@ -42,9 +42,8 @@ export default {
   components: { MapDialog },
   mounted() {
     this.mapDialogVisible = false;
-    let dt = fomatDateToStrToYMD(new Date());
-    let t1 = dt + " 00:00:00";
-    let t2 = dt + " 23:59:59";
+    let t1 = getDay(-1);
+    let t2 = getDay(0);
     this.timeRange = [t1, t2];
     this.baiduMap();
     this.getMapPoint();
@@ -168,13 +167,13 @@ export default {
         time = key;
       }
       let json = infoDatas[time];
-      let CKWD = json["出口温度"];
-      let CKND = json["出口NMHC浓度"];
-      let CKYL = json["出口压力"];
-      let CKLL = json["出口流量"];
-      let JKWD = json["进口温度"];
-      let JKYL = json["进口压力"];
-      let JKLL = json["进口流量"];
+      let CKWD = json["出口温度"] == undefined ? "-" : json["出口温度"];
+      let CKND = json["出口浓度"] == undefined ? "-" : json["出口浓度"];
+      let CKYL = json["出口压力"] == undefined ? "-" : json["出口压力"];
+      let CKLL = json["出口流量"] == undefined ? "-" : json["出口流量"];
+      let JKWD = json["进口温度"] == undefined ? "-" : json["进口温度"];
+      let JKYL = json["进口压力"] == undefined ? "-" : json["进口压力"];
+      let JKLL = json["进口流量"] == undefined ? "-" : json["进口流量"];
       let html = [
         "<div class='infoBoxContent'><div class='title'><strong>报警分析</strong></div>",
         "<div class='list'>",
@@ -267,7 +266,7 @@ export default {
             type: "bar",
             label: {
               show: true,
-              position: "top"
+              position: "bottom"
             },
             barGap: 0.1,
             showBackground: true,
@@ -279,7 +278,7 @@ export default {
             type: "bar",
             label: {
               show: true,
-              position: "top"
+              position: "bottom"
             },
             showBackground: true,
             backgroundStyle: {
@@ -296,8 +295,11 @@ export default {
     },
     //获取油气处理装置信息、发油信息
     async getInstitutionData(data) {
-      var that = this;
-      var params = {
+      let that = this;
+      let t1 = getDay(-1);
+      let t2 = getDay(0);
+      this.timeRange = [t1, t2];
+      let params = {
         institutionId: data.pointId,
         beginTime: that.timeRange[0],
         endTime: that.timeRange[1]

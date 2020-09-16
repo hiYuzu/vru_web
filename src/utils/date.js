@@ -45,3 +45,39 @@ export function fomatDateToStrToYMD(date, pattern) {
   }
   return d.toLocaleString();
 }
+
+export function getDay(day) {
+  var today = new Date();
+  var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day;
+  today.setTime(targetday_milliseconds); //注意，这行是关键代码
+  var tYear = today.getFullYear();
+  var tMonth = today.getMonth();
+  var tDate = today.getDate();
+  var tHour = today.getHours() > 9 ? today.getHours() : "0" + today.getHours();
+  var tSecond =
+    today.getSeconds() > 9 ? today.getSeconds() : "0" + today.getSeconds();
+  var tminute =
+    today.getMinutes() > 9 ? today.getMinutes() : "0" + today.getMinutes();
+  tMonth = doHandleMonth(tMonth + 1);
+  tDate = doHandleMonth(tDate);
+  return (
+    tYear +
+    "-" +
+    tMonth +
+    "-" +
+    tDate +
+    " " +
+    tHour +
+    ":" +
+    tminute +
+    ":" +
+    tSecond
+  );
+}
+function doHandleMonth(month) {
+  var m = month;
+  if (month.toString().length == 1) {
+    m = "0" + month;
+  }
+  return m;
+}
