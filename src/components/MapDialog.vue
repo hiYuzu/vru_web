@@ -229,8 +229,8 @@ export default {
           fixed: true
         },
         {
-          prop: "出口NMHC浓度",
-          text: "出口NMHC浓度",
+          prop: "出口浓度",
+          text: "出口浓度",
           width: 100
         },
         {
