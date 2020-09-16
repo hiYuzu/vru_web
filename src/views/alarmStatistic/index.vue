@@ -196,18 +196,28 @@ export default {
       deviceDataOfWarn: [],
       deviceDataOfAlarm: [],
       chart1: {
-        legendData: ["气液比", "压力", "NMHC浓度", "断开连接"],
+        legendData: [
+          "发油气液比",
+          "系统压力值",
+          "出口浓度值",
+          "进出流量比",
+          "断开连接"
+        ],
         seriesData: [
           {
-            name: "气液比",
+            name: "发油气液比",
             value: 0
           },
           {
-            name: "压力",
+            name: "系统压力值",
             value: 0
           },
           {
-            name: "NMHC浓度",
+            name: "出口浓度值",
+            value: 0
+          },
+          {
+            name: "进出流量比",
             value: 0
           },
           {
@@ -263,9 +273,10 @@ export default {
         .then(response => {
           if (response.data.status) {
             let data = response.data.data;
-            this.chart1.seriesData[0].value = data.GLR;
-            this.chart1.seriesData[1].value = data.PRE;
-            this.chart1.seriesData[2].value = data.NMHC;
+            this.chart1.seriesData[0].value = data.QYB;
+            this.chart1.seriesData[1].value = data.YL;
+            this.chart1.seriesData[2].value = data.ND;
+            this.chart1.seriesData[3].value = data.LLB;
             this.chart1.seriesData[3].value = data.O;
           }
         })
