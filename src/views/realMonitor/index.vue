@@ -1,6 +1,23 @@
 <template>
   <div>
     <div class="baidumap" id="allmap"></div>
+    <div
+      style="    position: absolute;
+    top: 130px;
+    right: 15px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 400;
+    color: #5a79ba;
+    box-shadow: 5px 5px 5px #888888;"
+    >
+      <img
+        src="@/assets/images/realMonitor/jishiqi1.gif"
+        style="height:32px;float:left"
+      />
+      <span style="float:left;margin-top:10px;">{{ dataUpdateTime }}</span>
+    </div>
     <map-dialog
       v-show="mapDialogVisible"
       :dialogVisible="mapDialogVisible"
@@ -36,7 +53,8 @@ export default {
       institutionId: "",
       timer: null,
       zoomLevel: 16,
-      infoBoxJson: {}
+      infoBoxJson: {},
+      dataUpdateTime: ""
     };
   },
   components: { MapDialog },
@@ -79,6 +97,7 @@ export default {
       //添加地图类型控件
       this.map.addControl(
         new window.BMap.MapTypeControl({
+          anchor: window.BMAP_ANCHOR_TOP_LEFT,
           mapTypes: [window.BMAP_NORMAL_MAP, window.BMAP_HYBRID_MAP]
         })
       );
@@ -109,6 +128,7 @@ export default {
               for (let key in infoDatas) {
                 time = key;
               }
+              this.dataUpdateTime = time;
               let json = infoDatas[time];
               data[i]["json"] = json;
               data[i]["time"] = time;
@@ -124,7 +144,9 @@ export default {
                 }
               }
             }
-            that.map.setViewport(arrPois, { margins: [160, 20, 0, 100] });
+            let point = new window.BMap.Point(117.311698, 39.127415); //设置地图位置117.56479, 39.096422
+            that.map.centerAndZoom(point, 12);
+            // that.map.setViewport(arrPois, { margins: [160, 20, 0, 100] });
             that.map.addEventListener("zoomend", function() {
               that.zoomLevel = that.map.getZoom();
               that.bindZoomnEvent(data);
@@ -142,11 +164,11 @@ export default {
       let that = this;
       let point = new window.BMap.Point(data.mapX, data.mapY);
       if (data.alarmCount > 0) {
-        image = require("../../assets/images/realMonitor/alarm1.gif");
+        image = require("@/assets/images/realMonitor/alarm1.gif");
       } else if (data.warnCount > 0) {
-        image = require("../../assets/images/realMonitor/warning1.gif");
+        image = require("@/assets/images/realMonitor/warning1.gif");
       } else {
-        image = require("../../assets/images/realMonitor/normal.png");
+        image = require("@/assets/images/realMonitor/normal.png");
       }
       let myIcon = new window.BMap.Icon(image, new window.BMap.Size(47, 57));
       let marker = new window.BMap.Marker(point, { icon: myIcon }); // 创建标注
