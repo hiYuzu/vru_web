@@ -47,14 +47,14 @@ export default {
     this.timeRange = [t1, t2];
     this.baiduMap();
     this.getMapPoint();
-    /* if (this.timer) {
+    if (this.timer) {
       clearInterval(this.timer);
     } else {
       var i = 0;
       this.timer = setInterval(() => {
         this.getMapPoint(i);
-      }, 30000);
-    } */
+      }, 60000);
+    }
   },
   destroyed() {
     clearInterval(this.timer);
@@ -64,8 +64,8 @@ export default {
       this.map = new window.BMap.Map("allmap"); //创建地图
       this.map.enableScrollWheelZoom(); ////启用滚轮放大缩小
       this.map.enableDragging();
-      let point = new window.BMap.Point(117.56479, 39.096422); //设置地图位置
-      this.map.centerAndZoom(point, 15);
+      let point = new window.BMap.Point(117.311698, 39.127415); //设置地图位置117.56479, 39.096422
+      this.map.centerAndZoom(point, 12);
       let styleJson = [
         {
           featureType: "poilabel",
@@ -95,23 +95,40 @@ export default {
       mapPointsQuery()
         .then(res => {
           if (res.status) {
-            let arrPois = [];
+            that.infoBoxJson = {};
+            that.zoomLevel = that.map.getZoom();
             const { data } = res.data;
+            let arrPois = [];
             for (let i = 0; i < data.length; i++) {
-              /*   if (i == 0) {
-                data[i].alarmCount = 0;
-                data[i].warnCount = 3;
-              }
-              if (i == 2) {
-                data[i].alarmCount = 0;
-                data[i].warnCount = 0;
-              } */
-              let point = new window.BMap.Point(data[i].mapX, data[i].mapY);
-
-              arrPois.push(point);
               that.addMarker(data[i]);
+              let infobox = that.infoBoxJson[data[i].pointId];
+              let point = new window.BMap.Point(data[i].mapX, data[i].mapY);
+              arrPois.push(point);
+              let infoDatas = data[i].monitorVOMap;
+              let time = "";
+              for (let key in infoDatas) {
+                time = key;
+              }
+              let json = infoDatas[time];
+              data[i]["json"] = json;
+              data[i]["time"] = time;
+              if (that.zoomLevel >= mapZoomLevel) {
+                if (infobox != undefined) {
+                  that.infoBoxJson[data[i].pointId].show();
+                } else {
+                  that.showInfoWindow(point, data[i]);
+                }
+              } else {
+                if (infobox != undefined) {
+                  that.infoBoxJson[data[i].pointId].hide();
+                }
+              }
             }
             that.map.setViewport(arrPois, { margins: [160, 20, 0, 100] });
+            that.map.addEventListener("zoomend", function() {
+              that.zoomLevel = that.map.getZoom();
+              that.bindZoomnEvent(data);
+            });
           }
         })
         .catch(() => {
@@ -120,6 +137,7 @@ export default {
     },
     //地图上描点
     addMarker(data) {
+      // console.info("zou0......" + JSON.stringify(data.monitorVOMap));
       let image = "";
       let that = this;
       let point = new window.BMap.Point(data.mapX, data.mapY);
@@ -133,23 +151,6 @@ export default {
       let myIcon = new window.BMap.Icon(image, new window.BMap.Size(47, 57));
       let marker = new window.BMap.Marker(point, { icon: myIcon }); // 创建标注
       that.map.addOverlay(marker);
-
-      that.map.addEventListener("zoomend", function() {
-        that.zoomLevel = that.map.getZoom();
-        let infobox = that.infoBoxJson[data.pointId];
-        if (that.zoomLevel >= mapZoomLevel) {
-          if (infobox != undefined) {
-            that.infoBoxJson[data.pointId].show();
-          } else {
-            that.showInfoWindow(marker, data);
-          }
-        } else {
-          if (infobox != undefined) {
-            that.infoBoxJson[data.pointId].hide();
-          }
-        }
-      });
-
       marker.addEventListener(
         "onclick",
         function() {
@@ -162,6 +163,32 @@ export default {
     bindMarkerClick(data) {
       this.mapDialogVisible = false;
       this.getInstitutionData(data);
+    },
+    //绑定滚轮事件
+    bindZoomnEvent(data) {
+      for (let i = 0; i < data.length; i++) {
+        let infobox = this.infoBoxJson[data[i].pointId];
+        let point = new window.BMap.Point(data[i].mapX, data[i].mapY);
+        let infoDatas = data[i].monitorVOMap;
+        let time = "";
+        for (let key in infoDatas) {
+          time = key;
+        }
+        let json = infoDatas[time];
+        data[i]["json"] = json;
+        data[i]["time"] = time;
+        if (this.zoomLevel >= mapZoomLevel) {
+          if (infobox != undefined) {
+            this.infoBoxJson[data[i].pointId].show();
+          } else {
+            this.showInfoWindow(point, data[i]);
+          }
+        } else {
+          if (infobox != undefined) {
+            this.infoBoxJson[data[i].pointId].hide();
+          }
+        }
+      }
     },
     //获取油气处理装置信息、发油信息
     async getInstitutionData(data) {
@@ -325,12 +352,8 @@ export default {
     //监测点位的窗口信息
     showInfoWindow(marker, data) {
       let id = data.pointId;
-      let infoDatas = data.monitorVOMap;
-      let time = "";
-      for (let key in infoDatas) {
-        time = key;
-      }
-      let json = infoDatas[time];
+      let time = data.time;
+      let json = data.json;
       let CKWD = json["出口温度"] == undefined ? "-" : json["出口温度"];
       let CKND = json["出口浓度"] == undefined ? "-" : json["出口浓度"];
       let CKYL = json["出口压力"] == undefined ? "-" : json["出口压力"];
@@ -366,6 +389,7 @@ export default {
         "</div>",
         "</div>"
       ];
+      //debugger;
       let image = require("../../assets/images/realMonitor/borderBg.png");
       let infoBox = new window.BMapLib.InfoBox(this.map, html.join(""), {
         offset: new window.BMap.Size(10, 30),
