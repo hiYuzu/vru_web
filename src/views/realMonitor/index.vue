@@ -16,7 +16,10 @@
         src="@/assets/images/realMonitor/jishiqi1.gif"
         style="height:32px;float:left"
       />
-      <span style="float:left;margin-top:10px;">{{ dataUpdateTime }}</span>
+      <span style="float:left;margin-top:7px;"
+        >倒计时<span style="color:red;">{{ dataUpdateTime }}</span
+        >更新</span
+      >
     </div>
     <map-dialog
       v-show="mapDialogVisible"
@@ -54,11 +57,12 @@ export default {
       timer: null,
       zoomLevel: 16,
       infoBoxJson: {},
-      dataUpdateTime: ""
+      dataUpdateTime: 60
     };
   },
   components: { MapDialog },
   mounted() {
+    this.getSecond(60);
     this.mapDialogVisible = false;
     let t1 = getDay(-1);
     let t2 = getDay(0);
@@ -69,15 +73,33 @@ export default {
       clearInterval(this.timer);
     } else {
       var i = 0;
-      this.timer = setInterval(() => {
-        this.getMapPoint(i);
+      let that = this;
+      that.timer = setInterval(() => {
+        that.getSecond(60);
+        that.getMapPoint(i);
       }, 60000);
     }
   },
   destroyed() {
+    alert("ss");
     clearInterval(this.timer);
   },
   methods: {
+    getSecond(wait) {
+      let _this = this;
+      let _wait = wait;
+      if (wait == 0) {
+        this.dataUpdateTime = 60;
+        wait = _wait;
+      } else {
+        this.btnDisabled = true;
+        this.dataUpdateTime = wait;
+        wait--;
+        setTimeout(function() {
+          _this.getSecond(wait);
+        }, 1000);
+      }
+    },
     baiduMap() {
       this.map = new window.BMap.Map("allmap"); //创建地图
       this.map.enableScrollWheelZoom(); ////启用滚轮放大缩小
@@ -128,7 +150,6 @@ export default {
               for (let key in infoDatas) {
                 time = key;
               }
-              this.dataUpdateTime = time;
               let json = infoDatas[time];
               data[i]["json"] = json;
               data[i]["time"] = time;
@@ -585,6 +606,9 @@ export default {
   padding: 5px 1px;
 }
 .infoBox img {
+  display: none;
+}
+.el-tabs__nav .el-tabs__item:nth-child(1) span {
   display: none;
 }
 </style>
