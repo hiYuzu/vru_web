@@ -43,7 +43,7 @@ export default {
       menus: [
         {
           id: "realMonitor",
-          name: "实时数据",
+          name: "实时监控",
           icon: require("../assets/images/home/RealMonitoring.png"),
           url: "realMonitor"
         },

@@ -55,6 +55,7 @@ export default {
       title: "",
       institutionId: "",
       timer: null,
+      timeout: null,
       zoomLevel: 16,
       infoBoxJson: {},
       dataUpdateTime: 60
@@ -62,7 +63,6 @@ export default {
   },
   components: { MapDialog },
   mounted() {
-    this.getSecond(60);
     this.mapDialogVisible = false;
     let t1 = getDay(-1);
     let t2 = getDay(0);
@@ -74,9 +74,8 @@ export default {
     } else {
       let that = this;
       that.timer = setInterval(() => {
-        that.getSecond(60);
-        that.getMapPoint();
-      }, 60000);
+        this.getSecond(60);
+      }, 1000);
     }
   },
   destroyed() {
@@ -85,17 +84,15 @@ export default {
   methods: {
     getSecond(wait) {
       let _this = this;
-      let _wait = wait;
-      if (wait == 0) {
-        this.dataUpdateTime = 60;
-        wait = _wait;
-      } else {
-        this.btnDisabled = true;
+      if (this.dataUpdateTime == 0) {
         this.dataUpdateTime = wait;
-        wait--;
-        setTimeout(function() {
+        console.info(this.dataUpdateTime);
+        _this.getMapPoint();
+      } else {
+        this.dataUpdateTime--;
+        /*    _this.timeout = setTimeout(function() {
           _this.getSecond(wait);
-        }, 1000);
+        }, 1000); */
       }
     },
     baiduMap() {
