@@ -17,8 +17,8 @@
         style="height:32px;float:left"
       />
       <span style="float:left;margin-top:7px;"
-        >倒计时<span style="color:red;">{{ dataUpdateTime }}</span
-        >更新</span
+        ><span style="color:red;">{{ dataUpdateTime }}</span
+        >秒后更新</span
       >
     </div>
     <map-dialog
