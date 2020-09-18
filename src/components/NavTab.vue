@@ -112,8 +112,8 @@ export default {
       }
     },
     $route: {
-      handler: function(route) {
-        console.info(route);
+      handler: function() {
+        //console.info(route);
       },
       immediate: true
     }

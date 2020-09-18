@@ -85,9 +85,9 @@ export default {
       this.$router.push({ path: item.url });
       // tabNum 为当前点击的列表项在openedTab中的index，若不存在则为-1
       let tabNum = this.openedTab.indexOf(title);
-      console.log(tabNum);
+      /*    console.log(tabNum);
       console.log(this.openedTab);
-      console.log(this.$store.state.tab.openedTab);
+      console.log(this.$store.state.tab.openedTab); */
       if (tabNum === -1) {
         var param = { name: item.id, title: item.name };
         // 该标签当前没有打开

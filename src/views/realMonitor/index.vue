@@ -72,11 +72,10 @@ export default {
     if (this.timer) {
       clearInterval(this.timer);
     } else {
-      var i = 0;
       let that = this;
       that.timer = setInterval(() => {
         that.getSecond(60);
-        that.getMapPoint(i);
+        that.getMapPoint();
       }, 60000);
     }
   },
@@ -127,8 +126,7 @@ export default {
       this.map.clearOverlays();
     },
     //查询地图上的点位信息
-    getMapPoint(num) {
-      console.info(num);
+    getMapPoint() {
       this.map.clearOverlays();
       this.infoBoxJson = {};
       let that = this;

@@ -393,7 +393,6 @@ export default {
 
   methods: {
     handleClick(e) {
-      console.info(e);
       this.query(e.index);
     },
     //获取油气装置echarts图表的serierData
