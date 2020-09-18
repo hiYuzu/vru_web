@@ -180,12 +180,13 @@ import {
   getAlarmRank,
   getAlarmStatistic
 } from "@/api/user";
+import { getDay } from "@/utils/date.js";
 export default {
   name: "AlarmStatistic",
   components: { PieEcharts, BarEcharts, MutiBarEcharts },
   data() {
     return {
-      time: ["2020-06-01 00:00:00", "2020-06-10 23:59:59"],
+      time: [],
       levelOfPie: "1",
       levelOfBar: "1",
       institutionData: [],
@@ -196,35 +197,8 @@ export default {
       deviceDataOfWarn: [],
       deviceDataOfAlarm: [],
       chart1: {
-        legendData: [
-          "发油气液比",
-          "系统压力值",
-          "出口浓度值",
-          "进出流量比",
-          "断开连接"
-        ],
-        seriesData: [
-          {
-            name: "发油气液比",
-            value: 0
-          },
-          {
-            name: "系统压力值",
-            value: 0
-          },
-          {
-            name: "出口浓度值",
-            value: 0
-          },
-          {
-            name: "进出流量比",
-            value: 0
-          },
-          {
-            name: "断开连接",
-            value: 0
-          }
-        ]
+        legendData: ["气液比", "压力值", "浓度值", "流量比", "断开连接"],
+        seriesData: []
       },
       chart2: {
         xAxisData: [],
@@ -253,6 +227,10 @@ export default {
         .then(response => {
           if (response.data.status) {
             this.institutionData = response.data.data;
+            this.institutionIdOfWarn = this.institutionData[0].value;
+            this.getWarnDeviceHead();
+            this.institutionIdOfAlarm = this.institutionIdOfWarn;
+            this.getAlarmDeviceHead();
           } else {
             this.$message.error("初始化查询失败！");
           }
@@ -273,11 +251,28 @@ export default {
         .then(response => {
           if (response.data.status) {
             let data = response.data.data;
-            this.chart1.seriesData[0].value = data.QYB;
-            this.chart1.seriesData[1].value = data.YL;
-            this.chart1.seriesData[2].value = data.ND;
-            this.chart1.seriesData[3].value = data.LLB;
-            this.chart1.seriesData[3].value = data.O;
+            this.chart1.seriesData = [
+              {
+                name: "气液比",
+                value: data.QYB
+              },
+              {
+                name: "压力值",
+                value: data.YL
+              },
+              {
+                name: "浓度值",
+                value: data.ND
+              },
+              {
+                name: "流量比",
+                value: data.LLB
+              },
+              {
+                name: "断开连接",
+                value: data.O
+              }
+            ];
           }
         })
         .catch(() => {
@@ -308,6 +303,8 @@ export default {
         .then(response => {
           if (response.data.status) {
             this.deviceDataOfWarn = response.data.data;
+            this.deviceCodeOfWarn = this.deviceDataOfWarn[0].value;
+            this.getWarnStat();
           }
         })
         .catch(() => {
@@ -320,6 +317,8 @@ export default {
         .then(response => {
           if (response.data.status) {
             this.deviceDataOfAlarm = response.data.data;
+            this.deviceCodeOfAlarm = this.deviceDataOfAlarm[0].value;
+            this.getAlarmStat();
           }
         })
         .catch(() => {
@@ -386,6 +385,7 @@ export default {
     }
   },
   mounted() {
+    this.time = [getDay(-7), getDay(0)];
     this.initQuery();
   }
 };

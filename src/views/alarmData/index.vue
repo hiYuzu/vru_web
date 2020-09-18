@@ -107,6 +107,9 @@ export default {
           if (this.total > 0) {
             this.getData(this.currentPage, this.pageSize);
           }
+          if (this.total == 0) {
+            this.table.tableData = [];
+          }
         })
         .catch(() => {
           this.$message.error("查询报警数据量异常！");

@@ -15,7 +15,12 @@
       ></el-option>
     </el-select>
     <span class="">设备: </span>
-    <el-select v-model="queryParam.deviceCode" placeholder="请选择" size="mini">
+    <el-select
+      v-model="queryParam.deviceCode"
+      clearable
+      placeholder="请选择"
+      size="mini"
+    >
       <el-option
         v-for="item in deviceData"
         :key="item.label"
@@ -24,7 +29,12 @@
       ></el-option>
     </el-select>
     <span class="">报警类型：</span>
-    <el-select v-model="queryParam.alarmCode" placeholder="请选择" size="mini">
+    <el-select
+      v-model="queryParam.alarmCode"
+      clearable
+      placeholder="请选择"
+      size="mini"
+    >
       <el-option
         v-for="item in alarmData"
         :key="item.label"
@@ -48,13 +58,6 @@
     </el-button>
     <el-button
       type="primary"
-      icon="el-icon-refresh-right"
-      size="mini"
-      @click="init"
-      >重置
-    </el-button>
-    <el-button
-      type="primary"
       icon="el-icon-receiving"
       size="mini"
       @click="exportExcel"
@@ -68,6 +71,7 @@ import {
   getAlarmShowData,
   getAuthorityDeviceHead
 } from "@/api/user";
+import { getDay } from "@/utils/date.js";
 export default {
   name: "StatisticHead",
   data: function() {
@@ -76,15 +80,16 @@ export default {
       queryParam: {
         deviceCode: "",
         alarmCode: "",
-        time: ["2020-06-01 15:33:26", "2020-06-15 13:28:45"]
+        time: []
       },
       institutionData: [],
       deviceData: [],
       thingData: [],
       alarmData: [
-        { label: "气液比", value: "GLR" },
-        { label: "压力", value: "PRE" },
-        { label: "NMHC浓度", value: "NMHC" },
+        { label: "气液比", value: "QYB" },
+        { label: "流量比", value: "LLB" },
+        { label: "浓度值", value: "ND" },
+        { label: "压力值", value: "YL" },
         { label: "断开连接", value: "O" }
       ]
     };
@@ -95,6 +100,8 @@ export default {
         .then(response => {
           if (response.data.status) {
             this.institutionData = response.data.data;
+            this.institutionId = this.institutionData[0].value;
+            this.getAuthorityDeviceHead();
           } else {
             this.$message.error("初始化查询失败！");
           }
@@ -102,6 +109,7 @@ export default {
         .catch(() => {
           this.$message.error("数据查询异常！");
         });
+      this.query();
     },
     getAuthorityDeviceHead() {
       let params = {
@@ -207,6 +215,7 @@ export default {
     }
   },
   mounted() {
+    this.queryParam.time = [getDay(-1), getDay(0)];
     this.init();
   }
 };
