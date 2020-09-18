@@ -81,7 +81,6 @@ export default {
     }
   },
   destroyed() {
-    alert("ss");
     clearInterval(this.timer);
   },
   methods: {
@@ -104,7 +103,7 @@ export default {
       this.map = new window.BMap.Map("allmap"); //创建地图
       this.map.enableScrollWheelZoom(); ////启用滚轮放大缩小
       this.map.enableDragging();
-      let point = new window.BMap.Point(117.311698, 39.127415); //设置地图位置117.56479, 39.096422
+      let point = new window.BMap.Point(117.311698, 39.127495); //设置地图位置117.56479, 39.096422
       this.map.centerAndZoom(point, 12);
       let styleJson = [
         {
@@ -141,8 +140,6 @@ export default {
             const { data } = res.data;
             let arrPois = [];
             for (let i = 0; i < data.length; i++) {
-              that.addMarker(data[i]);
-              let infobox = that.infoBoxJson[data[i].pointId];
               let point = new window.BMap.Point(data[i].mapX, data[i].mapY);
               arrPois.push(point);
               let infoDatas = data[i].monitorVOMap;
@@ -153,21 +150,11 @@ export default {
               let json = infoDatas[time];
               data[i]["json"] = json;
               data[i]["time"] = time;
-              if (that.zoomLevel >= mapZoomLevel) {
-                if (infobox != undefined) {
-                  that.infoBoxJson[data[i].pointId].show();
-                } else {
-                  that.showInfoWindow(point, data[i]);
-                }
-              } else {
-                if (infobox != undefined) {
-                  that.infoBoxJson[data[i].pointId].hide();
-                }
-              }
+              that.addMarker(data[i]);
             }
-            let point = new window.BMap.Point(117.311698, 39.127415); //设置地图位置117.56479, 39.096422
-            that.map.centerAndZoom(point, 12);
-            // that.map.setViewport(arrPois, { margins: [160, 20, 0, 100] });
+            that.map.setViewport(arrPois, { margins: [40, 50, 120, 330] });
+            /* let point = new window.BMap.Point(117.311698, 39.127415); //设置地图位置117.56479, 39.096422
+            that.map.centerAndZoom(point, 12); */
             that.map.addEventListener("zoomend", function() {
               that.zoomLevel = that.map.getZoom();
               that.bindZoomnEvent(data);
@@ -180,7 +167,6 @@ export default {
     },
     //地图上描点
     addMarker(data) {
-      // console.info("zou0......" + JSON.stringify(data.monitorVOMap));
       let image = "";
       let that = this;
       let point = new window.BMap.Point(data.mapX, data.mapY);
@@ -194,6 +180,7 @@ export default {
       let myIcon = new window.BMap.Icon(image, new window.BMap.Size(47, 57));
       let marker = new window.BMap.Marker(point, { icon: myIcon }); // 创建标注
       that.map.addOverlay(marker);
+      that.definedWindows(point, data);
       marker.addEventListener(
         "onclick",
         function() {
@@ -201,6 +188,106 @@ export default {
         },
         false
       );
+    },
+    //自定义消息窗口
+    definedWindows(point, data) {
+      let id = data.pointId;
+      let time = data.time;
+      let json = data.json;
+      let CKWD = json["出口温度"] == undefined ? "-" : json["出口温度"];
+      let CKND = json["出口浓度"] == undefined ? "-" : json["出口浓度"];
+      let CKYL = json["出口压力"] == undefined ? "-" : json["出口压力"];
+      let CKLL = json["出口流量"] == undefined ? "-" : json["出口流量"];
+      let JKWD = json["进口温度"] == undefined ? "-" : json["进口温度"];
+      let JKYL = json["进口压力"] == undefined ? "-" : json["进口压力"];
+      let JKLL = json["进口流量"] == undefined ? "-" : json["进口流量"];
+      let html = [
+        "<div class='infoBoxContent'><div class='title'><strong>" +
+          data.pointName +
+          "报警分析</strong></div>",
+        "<div class='list'>",
+        "<div class='dataInfo'>",
+        "<div style='margin:10px 0px;'>",
+        "<label>出口浓度：<span>" + CKND + "</span></label>",
+        "<label>时间：<span>" + time + "</span></label>",
+        "</div>",
+        "<div style='margin:10px 0px;'>",
+        "<label>出口温度：" + CKWD + "</label>",
+        "<label>压力：" + CKYL + "</label>",
+        "<label>流量：" + CKLL + "</label>",
+        "</div>",
+        "<div style='margin:10px 0px;'>",
+        "<label>进口温度：" + JKWD + "</label>",
+        "<label>压力：" + JKYL + "</label>",
+        "<label>流量：" + JKLL + "</label>",
+        "</div>",
+        "</div>",
+        "<div class='chart' id='alarmlineChart" +
+          id +
+          "' style='width:310px;height:120px;'>",
+        "</div>",
+        "</div>",
+        "</div>"
+      ];
+      function ComplexCustomOverlay(point) {
+        this._point = point;
+      }
+      ComplexCustomOverlay.prototype = new window.BMap.Overlay();
+      ComplexCustomOverlay.prototype.initialize = function(map) {
+        this._map = map;
+        var div = (this._div = document.createElement("div"));
+        div.style.position = "absolute";
+        div.style.zIndex = window.BMap.Overlay.getZIndex(this._point.lat);
+        let image = require("../../assets/images/realMonitor/borderBg.png");
+        div.style.background = "url(" + image + ") no-repeat center top";
+        div.style.color = "white";
+        div.style.height = "263px";
+        div.style.width = "340px";
+        div.style.padding = "0px";
+        div.style.whiteSpace = "nowrap";
+        div.style.MozUserSelect = "none";
+        div.style.fontSize = "12px";
+        var divContent = (this._arrow = document.createElement("div"));
+        divContent.attributes.id = "sContent";
+
+        var arrow = (this._arrow = document.createElement("div"));
+        arrow.style.background = "transparent";
+        arrow.style.position = "absolute";
+        arrow.style.width = "10px";
+        arrow.style.height = "10px";
+        arrow.style.top = "10px";
+        arrow.style.left = "350px";
+        arrow.style.overflow = "hidden";
+        div.appendChild(arrow);
+        div.appendChild(divContent);
+        divContent.innerHTML = html.join("");
+        map.getPanes().labelPane.appendChild(div);
+
+        return div;
+      };
+      ComplexCustomOverlay.prototype.draw = function() {
+        var map = this._map;
+        var pixel = map.pointToOverlayPixel(this._point);
+        this._div.style.left =
+          pixel.x - parseInt(this._arrow.style.left) + "px";
+        this._div.style.top = pixel.y - 30 + "px";
+      };
+
+      var myCompOverlay = new ComplexCustomOverlay(point);
+
+      this.map.addOverlay(myCompOverlay);
+      this.infoBoxJson[data.pointId] = myCompOverlay;
+      let chartDatas = data.alarmCountVOList;
+      let dataArry = [];
+      dataArry.push(["product", "预警", "报警"]);
+      for (let i = 0; i < chartDatas.length; i++) {
+        dataArry.push([
+          chartDatas[i].alarmName,
+          chartDatas[i].warnCount,
+          chartDatas[i].alarmCount
+        ]);
+      }
+      this.initInboxChart(data.pointId, dataArry);
     },
     //地图上的点绑定click事件
     bindMarkerClick(data) {
@@ -220,11 +307,12 @@ export default {
         let json = infoDatas[time];
         data[i]["json"] = json;
         data[i]["time"] = time;
+
         if (this.zoomLevel >= mapZoomLevel) {
           if (infobox != undefined) {
             this.infoBoxJson[data[i].pointId].show();
           } else {
-            this.showInfoWindow(point, data[i]);
+            this.definedWindows(point, data[i]);
           }
         } else {
           if (infobox != undefined) {
@@ -392,7 +480,7 @@ export default {
       let myGeoLactionCtrl = new getLocationControl();
       return myGeoLactionCtrl;
     },
-    //监测点位的窗口信息
+    //监测点位的窗口信息暂时没有，先别删
     showInfoWindow(marker, data) {
       let id = data.pointId;
       let time = data.time;
