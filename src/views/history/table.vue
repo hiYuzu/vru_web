@@ -6,7 +6,7 @@
         v-model="head.institutionId"
         placeholder="请选择发油库"
         size="mini"
-        @change="fileterDevice"
+        @change="filterDevice"
       >
         <el-option
           v-for="item in head.institutionData"
@@ -119,7 +119,7 @@ export default {
         institutionId: null,
         deviceId: null,
         thingCode: [],
-        time: "",
+        time: [],
         dataType: 2011,
         institutionData: [],
         deviceData: [],
@@ -171,23 +171,32 @@ export default {
     };
   },
   mounted() {
-    this.init();
+    this.head.time.push(
+      this.dateFormatter(
+        new Date(new Date().setHours(0, 0, 0, 0) - 24 * 60 * 60 * 1000)
+      )
+    );
+    this.head.time.push(
+      this.dateFormatter(new Date(new Date().setHours(0, 0, 0, 0)))
+    );
+    this.init().then(() => {
+      this.query();
+    });
   },
   methods: {
     init() {
-      historyHeadInit()
-        .then(res => {
+      return new Promise(resolve => {
+        historyHeadInit().then(res => {
           const { data } = res.data;
           this.head.institutionData = data.institutionData;
           this.deviceData = data.deviceData;
           this.thingData = data.thingData;
           this.deviceThingData = data.deviceThingData;
           this.head.institutionId = this.head.institutionData[0].value;
-          this.fileterDevice();
-        })
-        .catch(() => {
-          this.$message.error("查询数据异常！");
+          this.filterDevice();
+          resolve(true);
         });
+      });
     },
     query() {
       this.currentPage = 1;
@@ -207,19 +216,15 @@ export default {
         dataType,
         time
       };
-      historyQuery(param)
-        .then(res => {
-          const { data } = res.data;
-          this.allTableData = data;
-          if (data) {
-            this.total = this.allTableData.length;
-          }
-          this.addField();
-          this.getData(this.currentPage, this.pageSize);
-        })
-        .catch(() => {
-          this.$message.error("查询表格异常！");
-        });
+      historyQuery(param).then(res => {
+        const { data } = res.data;
+        this.allTableData = data;
+        if (data) {
+          this.total = this.allTableData.length;
+        }
+        this.addField();
+        this.getData(this.currentPage, this.pageSize);
+      });
     },
     exportExcel() {
       var wb = this.$XLSX.utils.book_new();
@@ -288,7 +293,7 @@ export default {
         this.tableData = [];
       }
     },
-    fileterDevice() {
+    filterDevice() {
       this.head.deviceData = [];
       this.head.deviceId = null;
       for (let device of this.deviceData) {
@@ -372,6 +377,19 @@ export default {
         return false;
       }
       return true;
+    },
+    dateFormatter(str) {
+      let d = new Date(str);
+      let year = d.getFullYear();
+      let month =
+        d.getMonth() + 1 < 10 ? "0" + (d.getMonth() + 1) : d.getMonth() + 1;
+      let day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
+      let hour = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
+      let minute = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
+      let second = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
+      return (
+        [year, month, day].join("-") + " " + [hour, minute, second].join(":")
+      );
     }
   }
 };

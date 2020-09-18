@@ -42,22 +42,18 @@ service.interceptors.response.use(
           cancelButtonText: "取消",
           type: "warning"
         }
-      )
-        .then(() => {
-          store.dispatch("user/resetToken").then(() => {
-            location.reload();
-          });
-        })
-        .catch(() => {});
+      ).then(() => {
+        store.dispatch("user/resetToken").then(() => {
+          location.reload();
+        });
+      });
     } else {
-      console.log("err" + error);
       Message({
         message: error.message,
         type: "error",
         duration: 5 * 1000
       });
     }
-    return Promise.reject(error);
   }
 );
 
