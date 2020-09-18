@@ -3,6 +3,7 @@
   <div>
     <el-tabs
       v-model="editableTabsValue"
+      class="myNavTab"
       type="card"
       closable
       @tab-remove="removeTab"
@@ -127,4 +128,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.myNavTab::v-deep .el-tabs__nav .el-tabs__item:nth-child(1) span {
+  display: none;
+}
+</style>

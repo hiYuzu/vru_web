@@ -608,7 +608,4 @@ export default {
 .infoBox img {
   display: none;
 }
-.el-tabs__nav .el-tabs__item:nth-child(1) span {
-  display: none;
-}
 </style>
