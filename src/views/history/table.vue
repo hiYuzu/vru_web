@@ -172,13 +172,9 @@ export default {
   },
   mounted() {
     this.head.time.push(
-      this.dateFormatter(
-        new Date(new Date().setHours(0, 0, 0, 0) - 24 * 60 * 60 * 1000)
-      )
+      this.dateFormatter(new Date(new Date() - 24 * 60 * 60 * 1000))
     );
-    this.head.time.push(
-      this.dateFormatter(new Date(new Date().setHours(0, 0, 0, 0)))
-    );
+    this.head.time.push(this.dateFormatter(new Date(new Date())));
     this.init().then(() => {
       this.query();
     });
