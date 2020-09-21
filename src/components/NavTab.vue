@@ -101,6 +101,7 @@ export default {
         });
         this.editableTabsValue = newTab;
         this.openedTab.push(newTab);
+        this.$store.state.tab.activeTab = newTab;
         //this.openedUrl.push(url);
         //this.$router.push(this.route);
       }
@@ -109,6 +110,7 @@ export default {
       // 监听activetab以实现点击左侧栏时激活已存在的标签
       if (val !== this.editableTabsValue) {
         this.editableTabsValue = val;
+        this.$store.state.tab.activeTab = val;
       }
     },
     $route: {

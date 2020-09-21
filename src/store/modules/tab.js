@@ -1,7 +1,7 @@
 const state = {
   id: "123456",
   openedTab: ["realMonitor"],
-  activeTab: "",
+  activeTab: "realMonitor",
   openedTitle: "实时监控"
 };
 
