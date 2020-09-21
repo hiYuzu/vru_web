@@ -3,7 +3,7 @@
     <!--   <div class="home-text">name: 首页</div> -->
     <nav-header />
     <nav-tab />
-    <keep-alive>
+    <keep-alive exclude="realMonitor">
       <router-view />
     </keep-alive>
   </div>

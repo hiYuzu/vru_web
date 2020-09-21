@@ -84,15 +84,11 @@ export default {
   methods: {
     getSecond(wait) {
       let _this = this;
-      if (this.dataUpdateTime == 0) {
+      if (this.dataUpdateTime == 1) {
         this.dataUpdateTime = wait;
-        console.info(this.dataUpdateTime);
         _this.getMapPoint();
       } else {
         this.dataUpdateTime--;
-        /*    _this.timeout = setTimeout(function() {
-          _this.getSecond(wait);
-        }, 1000); */
       }
     },
     baiduMap() {
