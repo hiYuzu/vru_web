@@ -76,6 +76,7 @@
           :top="35"
           :bottom="5"
           :height="280"
+          v-if="'line' == this.$store.state.tab.activeTab"
         ></line-echart>
       </div>
     </div>
@@ -214,7 +215,7 @@ export default {
       let month =
         d.getMonth() + 1 < 10 ? "0" + (d.getMonth() + 1) : d.getMonth() + 1;
       let day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
-      let hour = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
+      let hour = d.getHours() < 10 ? "0" + d.getHouzrs() : d.getHours();
       let minute = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
       let second = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
       return (
@@ -227,7 +228,6 @@ export default {
       this.dateFormatter(new Date(new Date() - 24 * 60 * 60 * 1000))
     );
     this.head.time.push(this.dateFormatter(new Date(new Date())));
-
     this.init().then(() => {
       this.query();
     });
@@ -241,6 +241,7 @@ export default {
   width: 100%;
   height: 100%;
   flex-direction: column;
+
   .head {
     display: flex;
     height: 50px;
@@ -248,23 +249,28 @@ export default {
     flex-wrap: wrap;
     padding: 5px 0px;
     align-items: center;
+
     > span {
       margin-left: 10px;
       color: #8492a6;
       font-size: 13px;
     }
+
     .el-select {
       width: 150px;
       margin-left: 5px;
       position: relative;
     }
+
     .el-date-editor.el-input__inner {
       margin-left: 5px !important;
       width: 350px !important;
     }
+
     .marginLeft {
       margin-right: 20px;
     }
+
     .el-button--mini {
       font-size: 13px !important;
     }
@@ -273,6 +279,7 @@ export default {
   .pmClass {
     flex-grow: 1;
     width: 100%;
+
     .tableDiv {
       margin: 0px 5px;
       padding-right: 15px;
@@ -283,10 +290,12 @@ export default {
       border-top: 3px solid #87a7f9;
       background-color: #ffffff;
     }
+
     .box-header {
       border-bottom: 1px solid #f4f4f4;
       color: #444;
       padding: 10px;
+
       .box-title {
         display: inline-block;
         font-size: 18px;

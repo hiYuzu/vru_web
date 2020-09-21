@@ -158,10 +158,12 @@
               </el-button>
             </div>
           </div>
+          z
           <div class="box-body">
             <muti-bar-echarts
               :xAxisData="chart4.xAxisData"
               :seriesData="chart4.seriesData"
+              v-if="'alarmStatistic' == this.$store.state.tab.activeTab"
             ></muti-bar-echarts>
           </div>
         </div>
