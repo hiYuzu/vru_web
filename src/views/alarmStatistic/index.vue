@@ -397,7 +397,7 @@ export default {
   flex-wrap: wrap;
   align-content: flex-start;
   .head {
-    padding: 0px 0px 15px;
+    padding: 0px 0px 5px;
     align-items: center;
     > span {
       margin-left: 15px;

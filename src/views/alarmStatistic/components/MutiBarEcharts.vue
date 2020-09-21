@@ -33,12 +33,17 @@ export default {
             data: [18, 23, 29, 10, 13, 16]
           },
           {
-            name: "压力",
+            name: "压力值",
             type: "bar",
             data: [19, 23, 31, 12, 14, 18]
           },
           {
-            name: "NMHC浓度",
+            name: "浓度值",
+            type: "bar",
+            data: [19, 23, 31, 12, 13, 18]
+          },
+          {
+            name: "流量比",
             type: "bar",
             data: [19, 23, 31, 12, 13, 18]
           }
@@ -62,7 +67,7 @@ export default {
       );
       myChart.setOption({
         legend: {
-          data: ["气液比", "压力", "NMHC浓度"]
+          data: ["气液比", "压力值", "浓度值", "流量比"]
         },
         grid: {
           top: "28",

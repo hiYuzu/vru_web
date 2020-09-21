@@ -119,6 +119,7 @@ export default {
         .then(response => {
           if (response.data.status) {
             this.deviceData = response.data.data;
+            this.queryParam.deviceCode = this.deviceData[0].value;
           }
         })
         .catch(() => {
