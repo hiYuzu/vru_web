@@ -215,7 +215,7 @@ export default {
       let month =
         d.getMonth() + 1 < 10 ? "0" + (d.getMonth() + 1) : d.getMonth() + 1;
       let day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
-      let hour = d.getHours() < 10 ? "0" + d.getHouzrs() : d.getHours();
+      let hour = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
       let minute = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
       let second = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
       return (
@@ -227,7 +227,7 @@ export default {
     this.head.time.push(
       this.dateFormatter(new Date(new Date() - 24 * 60 * 60 * 1000))
     );
-    this.head.time.push(this.dateFormatter(new Date(new Date())));
+    this.head.time.push(this.dateFormatter(new Date()));
     this.init().then(() => {
       this.query();
     });

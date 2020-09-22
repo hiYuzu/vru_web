@@ -174,7 +174,7 @@ export default {
     this.head.time.push(
       this.dateFormatter(new Date(new Date() - 24 * 60 * 60 * 1000))
     );
-    this.head.time.push(this.dateFormatter(new Date(new Date())));
+    this.head.time.push(this.dateFormatter(new Date()));
     this.init().then(() => {
       this.query();
     });
