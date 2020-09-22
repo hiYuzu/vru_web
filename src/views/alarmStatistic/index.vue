@@ -37,6 +37,7 @@
             <pie-echarts
               :legendData="chart1.legendData"
               :seriesData="chart1.seriesData"
+              v-if="'alarmStatistic' == this.$store.state.tab.activeTab"
             ></pie-echarts>
           </div>
         </div>
@@ -58,6 +59,7 @@
             <bar-echarts
               :xAxisData="chart2.xAxisData"
               :seriesData="chart2.seriesData"
+              v-if="'alarmStatistic' == this.$store.state.tab.activeTab"
             ></bar-echarts>
           </div>
         </div>
@@ -111,6 +113,7 @@
             <muti-bar-echarts
               :xAxisData="chart3.xAxisData"
               :seriesData="chart3.seriesData"
+              v-if="'alarmStatistic' == this.$store.state.tab.activeTab"
             ></muti-bar-echarts>
           </div>
         </div>
@@ -158,7 +161,6 @@
               </el-button>
             </div>
           </div>
-          z
           <div class="box-body">
             <muti-bar-echarts
               :xAxisData="chart4.xAxisData"
